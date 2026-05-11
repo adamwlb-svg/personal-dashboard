@@ -1,14 +1,21 @@
-export default function SchedulePage() {
-  return (
-    <div>
-      <h1 className="text-2xl font-semibold text-white mb-2">Schedule</h1>
-      <p className="text-gray-400 text-sm">Your upcoming events and calendar.</p>
+import { prisma } from "@/lib/prisma";
+import { CalendarView } from "@/components/schedule/CalendarView";
 
-      <div className="mt-8 bg-surface-raised border border-surface-border rounded-xl p-6">
-        <p className="text-gray-500 text-sm text-center py-12">
-          No events yet — schedule something to get started.
-        </p>
-      </div>
-    </div>
-  );
+export default async function SchedulePage() {
+  const events = await prisma.event.findMany({
+    orderBy: { startTime: "asc" },
+  });
+
+  // Serialize Dates to strings for client component boundary
+  const serialized = events.map((e) => ({
+    ...e,
+    startTime: e.startTime.toISOString(),
+    endTime: e.endTime.toISOString(),
+    recurrenceEnd: e.recurrenceEnd?.toISOString() ?? null,
+    lastSyncedAt: e.lastSyncedAt?.toISOString() ?? null,
+    createdAt: e.createdAt.toISOString(),
+    updatedAt: e.updatedAt.toISOString(),
+  }));
+
+  return <CalendarView events={serialized} />;
 }

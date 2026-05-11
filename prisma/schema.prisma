@@ -13,3 +13,29 @@ model Task {
   completed Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model Event {
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String?
+  location      String?
+  startTime     DateTime
+  endTime       DateTime
+  allDay        Boolean   @default(false)
+  category      String    @default("personal")
+
+  // Recurrence — stored as RRULE string (iCal standard)
+  isRecurring   Boolean   @default(false)
+  rrule         String?
+  recurrenceEnd DateTime?
+
+  // Sync fields — ready for Google/Apple Calendar integration
+  googleEventId String?
+  appleEventId  String?
+  iCalUID       String?
+  syncSource    String?
+  lastSyncedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

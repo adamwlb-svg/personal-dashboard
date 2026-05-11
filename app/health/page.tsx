@@ -1,6 +1,6 @@
 export default function HealthPage() {
   return (
-    <div>
+    <div className="p-8 overflow-y-auto flex-1">
       <h1 className="text-2xl font-semibold text-white mb-2">Health</h1>
       <p className="text-gray-400 text-sm">Log and track your health metrics.</p>
 
