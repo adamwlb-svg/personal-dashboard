@@ -2,7 +2,7 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-white mb-2">Dashboard</h1>
-      <p className="text-gray-400 text-sm">Welcome back. Here's your overview.</p>
+      <p className="text-gray-400 text-sm">Welcome back. Here&apos;s your overview.</p>
 
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
