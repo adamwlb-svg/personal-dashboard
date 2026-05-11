@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { CalendarView } from "@/components/schedule/CalendarView";
 
-export default async function SchedulePage() {
-  const events = await prisma.event.findMany({
-    orderBy: { startTime: "asc" },
-  });
+export const dynamic = "force-dynamic";
 
-  // Serialize Dates to strings for client component boundary
+export default async function SchedulePage() {
+  let events: Awaited<ReturnType<typeof prisma.event.findMany>> = [];
+
+  try {
+    events = await prisma.event.findMany({ orderBy: { startTime: "asc" } });
+  } catch {
+    // Database not yet migrated — render empty calendar
+  }
+
   const serialized = events.map((e) => ({
     ...e,
     startTime: e.startTime.toISOString(),
