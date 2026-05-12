@@ -1,15 +1,25 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
-import { SerializedAccount, SerializedFinanceTodo, SerializedFinanceChatMessage } from "@/lib/finance";
+import {
+  SerializedAccount,
+  SerializedSnapshot,
+  SerializedGoal,
+  SerializedFinanceTodo,
+  SerializedFinanceChatMessage,
+} from "@/lib/finance";
 import { FinancesView } from "@/components/finances/FinancesView";
 
 export default async function FinancesPage() {
-  const [accounts, todos, chatMessages] = await Promise.all([
+  const [accounts, snapshots, goals, todos, chatMessages] = await Promise.all([
     prisma.financialAccount.findMany({
       where: { isActive: true },
       orderBy: { createdAt: "asc" },
     }),
+    prisma.balanceSnapshot.findMany({
+      orderBy: { recordedAt: "asc" },
+    }),
+    prisma.financialGoal.findMany({ orderBy: { createdAt: "asc" } }).catch(() => []),
     prisma.task.findMany({
       where: { category: "finance", parentId: null },
       orderBy: [{ completed: "asc" }, { priority: "asc" }, { dueDate: "asc" }],
@@ -24,6 +34,24 @@ export default async function FinancesPage() {
     ...a,
     createdAt: a.createdAt.toISOString(),
     updatedAt: a.updatedAt.toISOString(),
+  }));
+
+  const serializedSnapshots: SerializedSnapshot[] = snapshots.map((s) => ({
+    id: s.id,
+    accountId: s.accountId,
+    balance: s.balance,
+    recordedAt: s.recordedAt.toISOString(),
+  }));
+
+  const serializedGoals: SerializedGoal[] = goals.map((g) => ({
+    id: g.id,
+    name: g.name,
+    emoji: g.emoji,
+    targetAmount: g.targetAmount,
+    currentAmount: g.currentAmount,
+    targetDate: g.targetDate ? g.targetDate.toISOString() : null,
+    createdAt: g.createdAt.toISOString(),
+    updatedAt: g.updatedAt.toISOString(),
   }));
 
   const serializedTodos: SerializedFinanceTodo[] = todos.map((t) => ({
@@ -42,14 +70,14 @@ export default async function FinancesPage() {
     createdAt: m.createdAt.toISOString(),
   }));
 
-  const aiConfigured = !!process.env.ANTHROPIC_API_KEY;
-
   return (
     <FinancesView
       accounts={serializedAccounts}
+      snapshots={serializedSnapshots}
+      goals={serializedGoals}
       todos={serializedTodos}
       chatMessages={serializedMessages}
-      aiConfigured={aiConfigured}
+      aiConfigured={!!process.env.ANTHROPIC_API_KEY}
     />
   );
 }

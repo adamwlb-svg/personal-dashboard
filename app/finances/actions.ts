@@ -58,3 +58,43 @@ export async function deleteAccount(id: number) {
   await prisma.financialAccount.delete({ where: { id } });
   revalidatePath("/finances");
 }
+
+type GoalInput = {
+  name: string;
+  emoji: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: string;
+};
+
+export async function createGoal(data: GoalInput) {
+  await prisma.financialGoal.create({
+    data: {
+      name: data.name,
+      emoji: data.emoji,
+      targetAmount: data.targetAmount,
+      currentAmount: data.currentAmount,
+      targetDate: data.targetDate ? new Date(data.targetDate) : null,
+    },
+  });
+  revalidatePath("/finances");
+}
+
+export async function updateGoal(id: number, data: GoalInput) {
+  await prisma.financialGoal.update({
+    where: { id },
+    data: {
+      name: data.name,
+      emoji: data.emoji,
+      targetAmount: data.targetAmount,
+      currentAmount: data.currentAmount,
+      targetDate: data.targetDate ? new Date(data.targetDate) : null,
+    },
+  });
+  revalidatePath("/finances");
+}
+
+export async function deleteGoal(id: number) {
+  await prisma.financialGoal.delete({ where: { id } });
+  revalidatePath("/finances");
+}
