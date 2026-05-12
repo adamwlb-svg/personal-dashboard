@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { TodoView } from "@/components/todo/TodoView";
 
 export const dynamic = "force-dynamic";
 
+type TaskWithSubtasks = Prisma.TaskGetPayload<{
+  include: { subtasks: true };
+}>;
+
 export default async function TodoPage() {
-  let tasks: Awaited<ReturnType<typeof prisma.task.findMany>> = [];
+  let tasks: TaskWithSubtasks[] = [];
 
   try {
     tasks = await prisma.task.findMany({
