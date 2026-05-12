@@ -14,15 +14,13 @@ model Task {
   completed   Boolean   @default(false)
   completedAt DateTime?
   dueDate     DateTime?
-  priority    String    @default("medium") // high, medium, low
+  priority    String    @default("medium")
   category    String    @default("personal")
 
-  // Subtasks (self-referential)
   parentId Int?
   parent   Task?  @relation("TaskSubtasks", fields: [parentId], references: [id], onDelete: Cascade)
   subtasks Task[] @relation("TaskSubtasks")
 
-  // Calendar link — when set, this task is mirrored as a calendar event
   eventId Int?   @unique
   event   Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
 
@@ -40,21 +38,34 @@ model Event {
   allDay        Boolean   @default(false)
   category      String    @default("personal")
 
-  // Recurrence — stored as RRULE string (iCal standard)
   isRecurring   Boolean   @default(false)
   rrule         String?
   recurrenceEnd DateTime?
 
-  // Sync fields — ready for Google/Apple Calendar integration
   googleEventId String?
   appleEventId  String?
   iCalUID       String?
   syncSource    String?
   lastSyncedAt  DateTime?
 
-  // Linked task (reverse side)
   task Task?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model HealthMetric {
+  id       Int      @id @default(autoincrement())
+  type     String   // weight, sleep, water, exercise, mood, calories
+  value    Float
+  unit     String
+  notes    String?
+  loggedAt DateTime @default(now())
+}
+
+model HealthChatMessage {
+  id        Int      @id @default(autoincrement())
+  role      String   // user | assistant
+  content   String
+  createdAt DateTime @default(now())
 }
