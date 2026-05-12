@@ -1,10 +1,9 @@
 export const METRIC_TYPES = {
-  weight:   { label: "Weight",   unit: "lbs", icon: "⚖️",  color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20" },
-  sleep:    { label: "Sleep",    unit: "hrs", icon: "🌙",  color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20" },
-  water:    { label: "Water",    unit: "gl",  icon: "💧",  color: "text-cyan-400",    bg: "bg-cyan-500/10",    border: "border-cyan-500/20" },
-  exercise: { label: "Exercise", unit: "min", icon: "🏃",  color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-  mood:     { label: "Mood",     unit: "/5",  icon: "😊",  color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/20" },
-  calories: { label: "Calories", unit: "cal", icon: "🔥",  color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20" },
+  weight:      { label: "Weight",      unit: "lbs",  icon: "⚖️",  color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20" },
+  sleep:       { label: "Sleep",       unit: "hrs",  icon: "🌙",  color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20" },
+  exercise:    { label: "Exercise",    unit: "min",  icon: "🏃",  color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+  calories:    { label: "Calories",    unit: "cal",  icon: "🔥",  color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20" },
+  supplements: { label: "Supplements", unit: "dose", icon: "💊",  color: "text-pink-400",    bg: "bg-pink-500/10",    border: "border-pink-500/20" },
 } as const;
 
 export type MetricType = keyof typeof METRIC_TYPES;

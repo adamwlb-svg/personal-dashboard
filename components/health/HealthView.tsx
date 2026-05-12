@@ -12,12 +12,12 @@ type Props = {
   aiConfigured: boolean;
 };
 
-const METRIC_ORDER: MetricType[] = ["weight", "sleep", "water", "exercise", "mood", "calories"];
+const METRIC_ORDER: MetricType[] = ["weight", "sleep", "exercise", "calories", "supplements"];
 
 export function HealthView({ appointments, metrics, chatMessages, aiConfigured }: Props) {
-  const todayWater    = getTodayTotal(metrics, "water");
-  const todayExercise = getTodayTotal(metrics, "exercise");
-  const todayCalories = getTodayTotal(metrics, "calories");
+  const todayExercise    = getTodayTotal(metrics, "exercise");
+  const todayCalories    = getTodayTotal(metrics, "calories");
+  const todaySupplements = getTodayTotal(metrics, "supplements");
 
   return (
     <div className="space-y-6">
@@ -36,9 +36,9 @@ export function HealthView({ appointments, metrics, chatMessages, aiConfigured }
           <h3 className="text-sm font-semibold text-white mb-4">📊 Today&apos;s Summary</h3>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Water", value: todayWater, unit: "gl",  color: "text-cyan-400" },
-              { label: "Exercise", value: todayExercise, unit: "min", color: "text-emerald-400" },
-              { label: "Calories", value: todayCalories, unit: "cal", color: "text-orange-400" },
+              { label: "Exercise",    value: todayExercise,    unit: "min",  color: "text-emerald-400" },
+              { label: "Calories",    value: todayCalories,    unit: "cal",  color: "text-orange-400" },
+              { label: "Supplements", value: todaySupplements, unit: "doses", color: "text-pink-400" },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <p className={`text-xl font-semibold ${item.color}`}>
