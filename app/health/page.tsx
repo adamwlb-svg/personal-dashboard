@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { HealthView } from "@/components/health/HealthView";
 import { SerializedSupplementEntry } from "@/lib/health";
+import { SerializedFinanceTodo } from "@/lib/finance";
 
 export const dynamic = "force-dynamic";
 
@@ -9,12 +10,13 @@ export default async function HealthPage() {
   let metrics: Awaited<ReturnType<typeof prisma.healthMetric.findMany>> = [];
   let chatMessages: Awaited<ReturnType<typeof prisma.healthChatMessage.findMany>> = [];
   let supplements: Awaited<ReturnType<typeof prisma.supplementEntry.findMany>> = [];
+  let todos: Awaited<ReturnType<typeof prisma.task.findMany>> = [];
 
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    [appointments, metrics, chatMessages, supplements] = await Promise.all([
+    [appointments, metrics, chatMessages, supplements, todos] = await Promise.all([
       prisma.event.findMany({
         where: { category: "health", startTime: { gte: new Date() } },
         orderBy: { startTime: "asc" },
@@ -32,6 +34,10 @@ export default async function HealthPage() {
         where: { loggedAt: { gte: thirtyDaysAgo } },
         orderBy: { loggedAt: "desc" },
       }).catch(() => []),
+      prisma.task.findMany({
+        where: { category: "health", parentId: null },
+        orderBy: [{ completed: "asc" }, { priority: "asc" }, { dueDate: "asc" }],
+      }),
     ]);
   } catch {
     // Database not yet migrated — render empty state
@@ -71,12 +77,22 @@ export default async function HealthPage() {
     loggedAt: s.loggedAt.toISOString(),
   }));
 
+  const serializedTodos: SerializedFinanceTodo[] = todos.map((t) => ({
+    id: t.id,
+    title: t.title,
+    priority: t.priority,
+    dueDate: t.dueDate ? t.dueDate.toISOString() : null,
+    completed: t.completed,
+    notes: t.notes,
+  }));
+
   return (
     <div className="p-8 overflow-y-auto flex-1">
       <HealthView
         appointments={serializedAppointments}
         metrics={serializedMetrics}
         supplements={serializedSupplements}
+        todos={serializedTodos}
         chatMessages={serializedMessages}
         aiConfigured={!!process.env.ANTHROPIC_API_KEY}
       />

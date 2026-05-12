@@ -5,27 +5,29 @@ import {
   SerializedSupplementEntry,
   SerializedChatMessage,
   SerializedAppointment,
-  METRIC_TYPES,
   MetricType,
   getTodayTotal,
   getTodaySupplements,
 } from "@/lib/health";
+import { SerializedFinanceTodo } from "@/lib/finance";
 import { AppointmentsCard } from "./AppointmentsCard";
 import { MetricCard } from "./MetricCard";
 import { SupplementTracker } from "./SupplementTracker";
+import { HealthTodos } from "./HealthTodos";
 import { HealthChat } from "./HealthChat";
 
 type Props = {
   appointments: SerializedAppointment[];
   metrics: SerializedMetric[];
   supplements: SerializedSupplementEntry[];
+  todos: SerializedFinanceTodo[];
   chatMessages: SerializedChatMessage[];
   aiConfigured: boolean;
 };
 
 const METRIC_ORDER: MetricType[] = ["weight", "sleep", "exercise", "calories"];
 
-export function HealthView({ appointments, metrics, supplements, chatMessages, aiConfigured }: Props) {
+export function HealthView({ appointments, metrics, supplements, todos, chatMessages, aiConfigured }: Props) {
   const todayExercise = getTodayTotal(metrics, "exercise");
   const todayCalories = getTodayTotal(metrics, "calories");
   const todaySupplements = getTodaySupplements(supplements);
@@ -45,14 +47,9 @@ export function HealthView({ appointments, metrics, supplements, chatMessages, a
           <h3 className="text-sm font-semibold text-white mb-4">📊 Today&apos;s Summary</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              { label: "Exercise",  value: todayExercise, unit: "min", color: "text-emerald-400" },
-              { label: "Calories",  value: todayCalories, unit: "cal", color: "text-orange-400" },
-              {
-                label: "Supplements",
-                value: todaySupplements.length,
-                unit: todaySupplements.length === 1 ? "taken" : "taken",
-                color: "text-pink-400",
-              },
+              { label: "Exercise",    value: todayExercise,           unit: "min",   color: "text-emerald-400" },
+              { label: "Calories",    value: todayCalories,           unit: "cal",   color: "text-orange-400" },
+              { label: "Supplements", value: todaySupplements.length, unit: "taken", color: "text-pink-400" },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <p className={`text-xl font-semibold ${item.color}`}>
@@ -63,8 +60,6 @@ export function HealthView({ appointments, metrics, supplements, chatMessages, a
               </div>
             ))}
           </div>
-
-          {/* Today's supplement names */}
           {todaySupplements.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-3 border-t border-surface-border">
               {todaySupplements.map((s) => (
@@ -87,41 +82,40 @@ export function HealthView({ appointments, metrics, supplements, chatMessages, a
         </div>
       </div>
 
-      {/* Supplements + Fitbit row */}
+      {/* Supplements + To-Dos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SupplementTracker supplements={supplements} />
+        <HealthTodos todos={todos} />
+      </div>
 
-        {/* Fitbit placeholder */}
-        <div className="bg-surface-raised border border-surface-border rounded-xl p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <span>⌚</span> Wearable Sync
-            </h3>
-            <span className="text-xs text-gray-600 bg-surface px-2 py-0.5 rounded-full border border-surface-border">
-              Coming Soon
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 leading-relaxed mb-4">
-            Automatically sync steps, heart rate, sleep stages, and workouts from your Fitbit Charge 6.
-            When Google Health Connect supports web access, this will pull your data in real time.
-          </p>
-          <div className="space-y-2 mt-auto">
-            {[
-              { icon: "👣", label: "Steps", sub: "Daily step count" },
-              { icon: "❤️", label: "Heart Rate", sub: "Resting + zones" },
-              { icon: "🌙", label: "Sleep Stages", sub: "Deep, REM, light" },
-              { icon: "🏋️", label: "Workouts", sub: "Auto-detected sessions" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3 opacity-40">
-                <span className="text-base">{item.icon}</span>
-                <div>
-                  <p className="text-xs font-medium text-gray-300">{item.label}</p>
-                  <p className="text-xs text-gray-600">{item.sub}</p>
-                </div>
-                <div className="ml-auto w-2 h-2 rounded-full bg-gray-700" />
+      {/* Wearable sync placeholder */}
+      <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <span>⌚</span> Wearable Sync
+          </h3>
+          <span className="text-xs text-gray-600 bg-surface px-2 py-0.5 rounded-full border border-surface-border">
+            Coming Soon
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 leading-relaxed mb-4">
+          Automatically sync steps, heart rate, sleep stages, and workouts from your Fitbit Charge 6.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { icon: "👣", label: "Steps",       sub: "Daily step count" },
+            { icon: "❤️", label: "Heart Rate",  sub: "Resting + zones" },
+            { icon: "🌙", label: "Sleep Stages", sub: "Deep, REM, light" },
+            { icon: "🏋️", label: "Workouts",    sub: "Auto-detected" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-2 opacity-40">
+              <span className="text-base">{item.icon}</span>
+              <div>
+                <p className="text-xs font-medium text-gray-300">{item.label}</p>
+                <p className="text-xs text-gray-600">{item.sub}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
