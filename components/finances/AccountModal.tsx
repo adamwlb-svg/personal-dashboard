@@ -82,7 +82,7 @@ export function AccountModal({ account, onClose }: Props) {
                   type="button"
                   onClick={() => setType(key)}
                   className={`py-2 px-2 rounded-lg text-xs font-medium border transition-all flex flex-col items-center gap-0.5
-                    ${type === key ? `${t.bg} ${t.text} ${t.border}` : "bg-surface border-surface-border text-gray-500 hover:border-gray-500"}`}
+                    ${type === key ? `${t.bg} ${t.color} ${t.border}` : "bg-surface border-surface-border text-gray-500 hover:border-gray-500"}`}
                 >
                   <span>{t.icon}</span>
                   <span>{t.label}</span>
