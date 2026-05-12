@@ -31,7 +31,15 @@ export default async function FinancesPage() {
   ]);
 
   const serializedAccounts: SerializedAccount[] = accounts.map((a) => ({
-    ...a,
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    institution: a.institution,
+    balance: a.balance,
+    currency: a.currency,
+    isActive: a.isActive,
+    notes: a.notes,
+    plaidAccountId: a.plaidAccountId,
     createdAt: a.createdAt.toISOString(),
     updatedAt: a.updatedAt.toISOString(),
   }));

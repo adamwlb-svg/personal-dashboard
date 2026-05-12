@@ -70,20 +70,33 @@ model HealthChatMessage {
   createdAt DateTime @default(now())
 }
 
-model FinancialAccount {
-  id          Int      @id @default(autoincrement())
-  name        String
-  type        String   // checking, savings, investment, credit_card, loan, other
+model PlaidItem {
+  id          Int                @id @default(autoincrement())
+  itemId      String             @unique
+  accessToken String
   institution String?
-  balance     Float    @default(0)
-  currency    String   @default("USD")
-  isActive    Boolean  @default(true)
-  notes       String?
+  accounts    FinancialAccount[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
 
-  snapshots   BalanceSnapshot[]
+model FinancialAccount {
+  id             Int        @id @default(autoincrement())
+  name           String
+  type           String
+  institution    String?
+  balance        Float      @default(0)
+  currency       String     @default("USD")
+  isActive       Boolean    @default(true)
+  notes          String?
+  plaidAccountId String?    @unique
+  plaidItemId    Int?
+  plaidItem      PlaidItem? @relation(fields: [plaidItemId], references: [id], onDelete: SetNull)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  snapshots BalanceSnapshot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model BalanceSnapshot {

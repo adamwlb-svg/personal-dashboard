@@ -21,6 +21,7 @@ import { NetWorthChart } from "./NetWorthChart";
 import { AllocationBar } from "./AllocationBar";
 import { FinanceChat } from "./FinanceChat";
 import { FinanceTodos } from "./FinanceTodos";
+import { PlaidConnect } from "./PlaidConnect";
 import { updateBalance } from "@/app/finances/actions";
 
 type Props = {
@@ -67,6 +68,7 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
 
   const assetAccounts = accounts.filter((a) => a.isActive && !ACCOUNT_TYPES[a.type as AccountType]?.isLiability);
   const liabilityAccounts = accounts.filter((a) => a.isActive && ACCOUNT_TYPES[a.type as AccountType]?.isLiability);
+  const plaidConnectedCount = accounts.filter((a) => a.plaidAccountId).length;
 
   // Per-account sparkline data from snapshots
   const sparklineData = useMemo(() => {
@@ -119,15 +121,18 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
                 )}
               </div>
             </div>
-            <button
-              onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add Account
-            </button>
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <PlaidConnect connectedCount={plaidConnectedCount} />
+              <button
+                onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Manual
+              </button>
+            </div>
           </div>
           <NetWorthChart data={netWorthHistory} />
         </div>
@@ -428,6 +433,12 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
         <span className={`text-xs px-2 py-0.5 rounded-full border ${meta?.bg} ${meta?.color} ${meta?.border}`}>
           {meta?.label ?? account.type}
         </span>
+        {account.plaidAccountId && (
+          <span className="text-xs text-emerald-400 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Live
+          </span>
+        )}
         {account.notes && <span className="text-xs text-gray-600 truncate">{account.notes}</span>}
       </div>
     </div>

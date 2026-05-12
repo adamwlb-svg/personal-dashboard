@@ -18,6 +18,7 @@ export type SerializedAccount = {
   currency: string;
   isActive: boolean;
   notes: string | null;
+  plaidAccountId: string | null;
   createdAt: string;
   updatedAt: string;
 };
