@@ -8,10 +8,26 @@ datasource db {
 }
 
 model Task {
-  id        Int      @id @default(autoincrement())
-  title     String
-  completed Boolean  @default(false)
+  id          Int       @id @default(autoincrement())
+  title       String
+  notes       String?
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  dueDate     DateTime?
+  priority    String    @default("medium") // high, medium, low
+  category    String    @default("personal")
+
+  // Subtasks (self-referential)
+  parentId Int?
+  parent   Task?  @relation("TaskSubtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subtasks Task[] @relation("TaskSubtasks")
+
+  // Calendar link — when set, this task is mirrored as a calendar event
+  eventId Int?   @unique
+  event   Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Event {
@@ -35,6 +51,9 @@ model Event {
   iCalUID       String?
   syncSource    String?
   lastSyncedAt  DateTime?
+
+  // Linked task (reverse side)
+  task Task?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
