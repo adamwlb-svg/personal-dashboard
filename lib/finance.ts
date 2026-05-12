@@ -138,7 +138,7 @@ export function buildAllocation(accounts: SerializedAccount[]): AllocationSlice[
     map.set(a.type, (map.get(a.type) ?? 0) + a.balance);
   }
 
-  return [...map.entries()]
+  return Array.from(map.entries())
     .sort((a, b) => b[1] - a[1])
     .map(([type, amount]) => {
       const meta = ACCOUNT_TYPES[type as AccountType];
