@@ -139,7 +139,7 @@ export function HealthChat({ initialMessages, aiConfigured }: Props) {
             type="text"
             placeholder={
               aiConfigured
-                ? "e.g. "I slept 7.5 hrs", "ran 30 min", "took Vitamin D 2000mg"…"
+                ? `e.g. "I slept 7.5 hrs", "ran 30 min", "took Vitamin D 2000mg"…`
                 : "Add ANTHROPIC_API_KEY to Vercel to activate"
             }
             value={input}
