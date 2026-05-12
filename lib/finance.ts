@@ -110,7 +110,7 @@ export function buildNetWorthHistory(
   }
 
   // Unique dates across all snapshots
-  const dates = [...new Set(sorted.map((s) => s.recordedAt.substring(0, 10)))].sort();
+  const dates = Array.from(new Set(sorted.map((s) => s.recordedAt.substring(0, 10)))).sort();
 
   return dates.map((date) => {
     let netWorth = 0;
