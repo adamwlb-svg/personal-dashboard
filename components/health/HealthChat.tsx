@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SerializedChatMessage } from "@/lib/health";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function HealthChat({ initialMessages, aiConfigured }: Props) {
+  const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,7 @@ export function HealthChat({ initialMessages, aiConfigured }: Props) {
           ...prev,
           { id: Date.now() + 1, role: "assistant", content: data.message, createdAt: new Date().toISOString() },
         ]);
+        if (data.logged) router.refresh();
       }
     } finally {
       setLoading(false);
@@ -136,7 +139,7 @@ export function HealthChat({ initialMessages, aiConfigured }: Props) {
             type="text"
             placeholder={
               aiConfigured
-                ? "Log food, exercise, or ask a health question…"
+                ? "e.g. "I slept 7.5 hrs", "ran 30 min", "took Vitamin D 2000mg"…"
                 : "Add ANTHROPIC_API_KEY to Vercel to activate"
             }
             value={input}

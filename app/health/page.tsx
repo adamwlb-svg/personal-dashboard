@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { HealthView } from "@/components/health/HealthView";
+import { SerializedSupplementEntry } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 
@@ -7,12 +8,13 @@ export default async function HealthPage() {
   let appointments: Awaited<ReturnType<typeof prisma.event.findMany>> = [];
   let metrics: Awaited<ReturnType<typeof prisma.healthMetric.findMany>> = [];
   let chatMessages: Awaited<ReturnType<typeof prisma.healthChatMessage.findMany>> = [];
+  let supplements: Awaited<ReturnType<typeof prisma.supplementEntry.findMany>> = [];
 
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    [appointments, metrics, chatMessages] = await Promise.all([
+    [appointments, metrics, chatMessages, supplements] = await Promise.all([
       prisma.event.findMany({
         where: { category: "health", startTime: { gte: new Date() } },
         orderBy: { startTime: "asc" },
@@ -26,6 +28,10 @@ export default async function HealthPage() {
         orderBy: { createdAt: "asc" },
         take: 40,
       }),
+      prisma.supplementEntry.findMany({
+        where: { loggedAt: { gte: thirtyDaysAgo } },
+        orderBy: { loggedAt: "desc" },
+      }).catch(() => []),
     ]);
   } catch {
     // Database not yet migrated — render empty state
@@ -56,15 +62,23 @@ export default async function HealthPage() {
     createdAt: m.createdAt.toISOString(),
   }));
 
-  const aiConfigured = !!process.env.ANTHROPIC_API_KEY;
+  const serializedSupplements: SerializedSupplementEntry[] = supplements.map((s) => ({
+    id: s.id,
+    name: s.name,
+    amount: s.amount,
+    unit: s.unit,
+    notes: s.notes,
+    loggedAt: s.loggedAt.toISOString(),
+  }));
 
   return (
     <div className="p-8 overflow-y-auto flex-1">
       <HealthView
         appointments={serializedAppointments}
         metrics={serializedMetrics}
+        supplements={serializedSupplements}
         chatMessages={serializedMessages}
-        aiConfigured={aiConfigured}
+        aiConfigured={!!process.env.ANTHROPIC_API_KEY}
       />
     </div>
   );
