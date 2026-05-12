@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Products, CountryCodes } from "plaid";
+import { Products, CountryCode } from "plaid";
 import { plaidClient, isPlaidConfigured } from "@/lib/plaid";
 
 export async function POST() {
@@ -11,7 +11,7 @@ export async function POST() {
     user: { client_user_id: "personal-dashboard-user" },
     client_name: "Personal Dashboard",
     products: [Products.Transactions],
-    country_codes: [CountryCodes.Us],
+    country_codes: [CountryCode.Us],
     language: "en",
   });
 

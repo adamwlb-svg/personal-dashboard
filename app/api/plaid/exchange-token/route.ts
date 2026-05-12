@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CountryCodes } from "plaid";
+import { CountryCode } from "plaid";
 import { plaidClient, isPlaidConfigured, mapPlaidType } from "@/lib/plaid";
 import { prisma } from "@/lib/prisma";
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (institutionId) {
     const instRes = await plaidClient.institutionsGetById({
       institution_id: institutionId,
-      country_codes: [CountryCodes.Us],
+      country_codes: [CountryCode.Us],
     });
     institutionName = instRes.data.institution.name;
   }
