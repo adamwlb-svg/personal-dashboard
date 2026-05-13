@@ -57,3 +57,11 @@ export async function deleteEvent(id: number) {
   await prisma.event.delete({ where: { id } });
   revalidatePath("/schedule");
 }
+
+export async function moveEvent(id: number, startTime: string, endTime: string) {
+  await prisma.event.update({
+    where: { id },
+    data: { startTime: new Date(startTime), endTime: new Date(endTime) },
+  });
+  revalidatePath("/schedule");
+}

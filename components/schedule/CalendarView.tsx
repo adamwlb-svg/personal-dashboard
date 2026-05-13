@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { moveEvent } from "@/app/schedule/actions";
 import {
   format,
   addMonths,
@@ -55,10 +57,16 @@ export function CalendarView({
   events: SerializedEvent[];
   todos?: SerializedTodoDue[];
 }) {
+  const router = useRouter();
   const [view, setView] = useState<"month" | "week">("month");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [modal, setModal] = useState<ModalState>({ open: false });
+
+  const handleMoveEvent = useCallback(async (id: number, newStart: Date, newEnd: Date) => {
+    await moveEvent(id, newStart.toISOString(), newEnd.toISOString());
+    router.refresh();
+  }, [router]);
 
   const todos: TodoDue[] = useMemo(
     () => serializedTodos.map((t) => ({ ...t, dueDate: new Date(t.dueDate) })),
@@ -224,6 +232,7 @@ export function CalendarView({
                 )
               }
               onEventClick={openEdit}
+              onMoveEvent={handleMoveEvent}
             />
           ) : (
             <WeekView
@@ -232,6 +241,7 @@ export function CalendarView({
               todos={todos}
               onEventClick={openEdit}
               onSlotClick={(date) => openNew(date)}
+              onMoveEvent={handleMoveEvent}
             />
           )}
         </div>
