@@ -11,11 +11,12 @@ import {
   isToday,
   format,
 } from "date-fns";
-import { CalendarEvent, CATEGORIES, CategoryKey } from "@/lib/calendar";
+import { CalendarEvent, TodoDue, CATEGORIES, CategoryKey } from "@/lib/calendar";
 
 type Props = {
   currentDate: Date;
   events: CalendarEvent[];
+  todos: TodoDue[];
   selectedDay: Date | null;
   onDayClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
@@ -27,6 +28,7 @@ const MAX_CHIPS = 3;
 export function MonthGrid({
   currentDate,
   events,
+  todos,
   selectedDay,
   onDayClick,
   onEventClick,
@@ -59,6 +61,8 @@ export function MonthGrid({
       >
         {days.map((day) => {
           const dayEvents = events.filter((e) => isSameDay(e.startTime, day));
+          const dayTodos = todos.filter((t) => isSameDay(t.dueDate, day));
+          const totalItems = dayEvents.length + dayTodos.length;
           const isSelected = selectedDay && isSameDay(day, selectedDay);
           const inMonth = isSameMonth(day, currentDate);
           const today = isToday(day);
@@ -107,9 +111,21 @@ export function MonthGrid({
                 );
               })}
 
-              {dayEvents.length > MAX_CHIPS && (
+              {dayTodos.slice(0, Math.max(0, MAX_CHIPS - dayEvents.length)).map((todo) => (
+                <a
+                  key={`todo-${todo.id}`}
+                  href="/todo"
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-full text-left text-xs px-1.5 py-0.5 rounded truncate font-medium transition-opacity hover:opacity-75 bg-amber-500/20 text-amber-400 flex items-center gap-0.5"
+                >
+                  <span className="font-bold flex-shrink-0">!</span>
+                  <span className="truncate">{todo.title}</span>
+                </a>
+              ))}
+
+              {totalItems > MAX_CHIPS && (
                 <span className="text-xs text-fg-3 pl-1">
-                  +{dayEvents.length - MAX_CHIPS} more
+                  +{totalItems - MAX_CHIPS} more
                 </span>
               )}
             </div>

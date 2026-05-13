@@ -1,5 +1,12 @@
 import { rrulestr } from "rrule";
 
+export type TodoDue = {
+  id: number;
+  title: string;
+  priority: string; // "high" | "medium" | "low"
+  dueDate: Date;
+};
+
 export type CalendarEvent = {
   id: number;
   title: string;

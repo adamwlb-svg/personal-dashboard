@@ -12,7 +12,7 @@ import {
   startOfWeek,
   endOfWeek,
 } from "date-fns";
-import { CalendarEvent, expandEvents } from "@/lib/calendar";
+import { CalendarEvent, TodoDue, expandEvents } from "@/lib/calendar";
 import { MonthGrid } from "./MonthGrid";
 import { WeekView } from "./WeekView";
 import { DayPanel } from "./DayPanel";
@@ -35,6 +35,13 @@ type SerializedEvent = Omit<
   updatedAt: string;
 };
 
+type SerializedTodoDue = {
+  id: number;
+  title: string;
+  priority: string;
+  dueDate: string;
+};
+
 type ModalState = {
   open: boolean;
   event?: CalendarEvent | null;
@@ -43,13 +50,20 @@ type ModalState = {
 
 export function CalendarView({
   events: serialized,
+  todos: serializedTodos = [],
 }: {
   events: SerializedEvent[];
+  todos?: SerializedTodoDue[];
 }) {
   const [view, setView] = useState<"month" | "week">("month");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [modal, setModal] = useState<ModalState>({ open: false });
+
+  const todos: TodoDue[] = useMemo(
+    () => serializedTodos.map((t) => ({ ...t, dueDate: new Date(t.dueDate) })),
+    [serializedTodos]
+  );
 
   const rawEvents: CalendarEvent[] = useMemo(
     () =>
@@ -202,6 +216,7 @@ export function CalendarView({
             <MonthGrid
               currentDate={currentDate}
               events={events}
+              todos={todos}
               selectedDay={selectedDay}
               onDayClick={(day) =>
                 setSelectedDay((prev) =>
@@ -214,6 +229,7 @@ export function CalendarView({
             <WeekView
               currentDate={currentDate}
               events={events}
+              todos={todos}
               onEventClick={openEdit}
               onSlotClick={(date) => openNew(date)}
             />
@@ -226,6 +242,7 @@ export function CalendarView({
         <DayPanel
           date={selectedDay}
           events={events}
+          todos={todos}
           onClose={() => setSelectedDay(null)}
           onNewEvent={openNew}
           onEditEvent={openEdit}

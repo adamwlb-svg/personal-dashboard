@@ -10,11 +10,12 @@ import {
   getHours,
   getMinutes,
 } from "date-fns";
-import { CalendarEvent, CATEGORIES, CategoryKey } from "@/lib/calendar";
+import { CalendarEvent, TodoDue, CATEGORIES, CategoryKey } from "@/lib/calendar";
 
 type Props = {
   currentDate: Date;
   events: CalendarEvent[];
+  todos: TodoDue[];
   onEventClick: (event: CalendarEvent) => void;
   onSlotClick: (date: Date) => void;
 };
@@ -42,6 +43,7 @@ function eventPosition(event: CalendarEvent) {
 export function WeekView({
   currentDate,
   events,
+  todos,
   onEventClick,
   onSlotClick,
 }: Props) {
@@ -72,6 +74,32 @@ export function WeekView({
           </div>
         ))}
       </div>
+
+      {/* Due-date strip */}
+      {days.some((day) => todos.some((t) => isSameDay(t.dueDate, day))) && (
+        <div className="flex border-b border-surface-border flex-shrink-0 bg-amber-500/5">
+          <div className="w-14 flex-shrink-0 flex items-center justify-end pr-2">
+            <span className="text-xs text-amber-400 font-bold">!</span>
+          </div>
+          {days.map((day) => {
+            const dayTodos = todos.filter((t) => isSameDay(t.dueDate, day));
+            return (
+              <div key={day.toISOString()} className="flex-1 border-l border-surface-border/40 py-1 px-1 flex flex-col gap-0.5 min-h-[24px]">
+                {dayTodos.map((todo) => (
+                  <a
+                    key={todo.id}
+                    href="/todo"
+                    className="text-xs px-1.5 py-0.5 rounded truncate font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors flex items-center gap-0.5"
+                  >
+                    <span className="font-bold flex-shrink-0">!</span>
+                    <span className="truncate">{todo.title}</span>
+                  </a>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Scrollable time grid */}
       <div className="flex flex-1 overflow-y-auto">

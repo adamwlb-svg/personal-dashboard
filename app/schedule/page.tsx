@@ -5,14 +5,22 @@ export const dynamic = "force-dynamic";
 
 export default async function SchedulePage() {
   let events: Awaited<ReturnType<typeof prisma.event.findMany>> = [];
+  let tasks: { id: number; title: string; priority: string; dueDate: Date }[] = [];
 
   try {
-    events = await prisma.event.findMany({ orderBy: { startTime: "asc" } });
+    [events, tasks] = await Promise.all([
+      prisma.event.findMany({ orderBy: { startTime: "asc" } }),
+      prisma.task.findMany({
+        where: { dueDate: { not: null }, completed: false, parentId: null },
+        select: { id: true, title: true, priority: true, dueDate: true },
+        orderBy: { dueDate: "asc" },
+      }).then((rows) => rows.filter((r) => r.dueDate !== null) as { id: number; title: string; priority: string; dueDate: Date }[]),
+    ]);
   } catch {
     // Database not yet migrated — render empty calendar
   }
 
-  const serialized = events.map((e) => ({
+  const serializedEvents = events.map((e) => ({
     ...e,
     startTime: e.startTime.toISOString(),
     endTime: e.endTime.toISOString(),
@@ -22,5 +30,12 @@ export default async function SchedulePage() {
     updatedAt: e.updatedAt.toISOString(),
   }));
 
-  return <CalendarView events={serialized} />;
+  const serializedTodos = tasks.map((t) => ({
+    id: t.id,
+    title: t.title,
+    priority: t.priority,
+    dueDate: t.dueDate!.toISOString(),
+  }));
+
+  return <CalendarView events={serializedEvents} todos={serializedTodos} />;
 }
