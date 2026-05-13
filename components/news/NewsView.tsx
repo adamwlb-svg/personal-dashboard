@@ -58,12 +58,12 @@ export function NewsView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-white">News</h1>
-          <p className="text-sm text-gray-400 mt-0.5">Top stories from The Guardian.</p>
+          <h1 className="text-2xl font-semibold text-fg">News</h1>
+          <p className="text-sm text-fg-2 mt-0.5">Top stories from The Guardian.</p>
         </div>
         <button
           onClick={() => fetchNews(category)}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 bg-surface-raised border border-surface-border rounded-lg"
+          className="flex items-center gap-1.5 text-xs text-fg-3 hover:text-fg-2 transition-colors px-3 py-1.5 bg-surface-raised border border-surface-border rounded-lg"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -81,7 +81,7 @@ export function NewsView() {
             className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               category === cat.id
                 ? "bg-accent/10 text-accent border border-accent/20"
-                : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                : "text-fg-3 hover:text-fg-2 hover:bg-white/5"
             }`}
           >
             {cat.label}
@@ -93,8 +93,8 @@ export function NewsView() {
       {!configured && (
         <div className="bg-surface-raised border border-surface-border rounded-xl p-8 text-center">
           <p className="text-2xl mb-3">📰</p>
-          <p className="text-white font-medium mb-2">Guardian API key not configured</p>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-fg font-medium mb-2">Guardian API key not configured</p>
+          <p className="text-sm text-fg-3 mb-4">
             Add <code className="text-accent bg-surface px-1.5 py-0.5 rounded">GUARDIAN_API_KEY</code> to your Vercel environment variables.
           </p>
           <a
@@ -144,21 +144,21 @@ export function NewsView() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <span className="absolute bottom-3 left-3 text-xs bg-accent/80 text-white px-2 py-0.5 rounded-full font-medium">
+                  <span className="absolute bottom-3 left-3 text-xs bg-accent/80 text-fg px-2 py-0.5 rounded-full font-medium">
                     {featured.section}
                   </span>
                 </div>
               )}
               <div className="p-4">
-                <h2 className="text-white font-semibold text-base leading-snug group-hover:text-accent transition-colors mb-2">
+                <h2 className="text-fg font-semibold text-base leading-snug group-hover:text-accent transition-colors mb-2">
                   {featured.title}
                 </h2>
                 {featured.trailText && (
-                  <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed mb-3">
+                  <p className="text-sm text-fg-2 line-clamp-2 leading-relaxed mb-3">
                     {stripHtml(featured.trailText)}
                   </p>
                 )}
-                <div className="flex items-center gap-3 text-xs text-gray-600">
+                <div className="flex items-center gap-3 text-xs text-fg-3">
                   {featured.byline && <span>{featured.byline}</span>}
                   <span>{timeAgo(featured.publishedAt)}</span>
                 </div>
@@ -186,14 +186,14 @@ export function NewsView() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-xs text-accent font-medium">{article.section}</span>
-                    <span className="text-xs text-gray-700">·</span>
-                    <span className="text-xs text-gray-600">{timeAgo(article.publishedAt)}</span>
+                    <span className="text-xs text-fg-4">·</span>
+                    <span className="text-xs text-fg-3">{timeAgo(article.publishedAt)}</span>
                   </div>
-                  <h3 className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors line-clamp-2 leading-snug">
+                  <h3 className="text-sm font-medium text-fg group-hover:text-fg transition-colors line-clamp-2 leading-snug">
                     {article.title}
                   </h3>
                   {article.byline && (
-                    <p className="text-xs text-gray-600 mt-1 truncate">{article.byline}</p>
+                    <p className="text-xs text-fg-3 mt-1 truncate">{article.byline}</p>
                   )}
                 </div>
               </a>
@@ -203,7 +203,7 @@ export function NewsView() {
       )}
 
       {!loading && configured && !error && articles.length === 0 && (
-        <div className="text-center py-12 text-gray-600">No articles found.</div>
+        <div className="text-center py-12 text-fg-3">No articles found.</div>
       )}
     </div>
   );

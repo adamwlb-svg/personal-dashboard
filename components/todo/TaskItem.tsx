@@ -41,24 +41,24 @@ function SubtaskRow({ subtask, onEdit }: { subtask: Subtask; onEdit: () => void 
           ${subtask.completed ? "bg-accent border-accent" : "border-gray-600 hover:border-accent"}`}
       >
         {subtask.completed && (
-          <svg className="w-2.5 h-2.5 text-white mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-2.5 h-2.5 text-fg mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         )}
       </button>
       <span
-        className={`text-sm flex-1 ${subtask.completed ? "line-through text-gray-600" : "text-gray-300"}`}
+        className={`text-sm flex-1 ${subtask.completed ? "line-through text-fg-3" : "text-fg-2"}`}
       >
         {subtask.title}
       </span>
       {subtask.dueDate && (
-        <span className={`text-xs ${overdue && !subtask.completed ? "text-red-400" : "text-gray-500"}`}>
+        <span className={`text-xs ${overdue && !subtask.completed ? "text-red-400" : "text-fg-3"}`}>
           {formatDueDate(subtask.dueDate)}
         </span>
       )}
       <button
         onClick={onEdit}
-        className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-gray-300 transition-all p-0.5"
+        className="opacity-0 group-hover:opacity-100 text-fg-3 hover:text-fg-2 transition-all p-0.5"
       >
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -101,7 +101,7 @@ export function TaskItem({ task }: Props) {
               ${task.completed ? "bg-accent border-accent" : "border-gray-600 hover:border-accent"}`}
           >
             {task.completed && (
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-fg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             )}
@@ -112,14 +112,14 @@ export function TaskItem({ task }: Props) {
 
           {/* Title + meta */}
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-medium truncate ${task.completed ? "line-through text-gray-600" : "text-gray-100"}`}>
+            <p className={`text-sm font-medium truncate ${task.completed ? "line-through text-fg-3" : "text-fg"}`}>
               {task.title}
               {task.eventId && (
                 <span className="ml-1.5 text-xs text-accent opacity-70">⟶ calendar</span>
               )}
             </p>
             {task.notes && !task.completed && (
-              <p className="text-xs text-gray-500 truncate mt-0.5">{task.notes}</p>
+              <p className="text-xs text-fg-3 truncate mt-0.5">{task.notes}</p>
             )}
           </div>
 
@@ -127,7 +127,7 @@ export function TaskItem({ task }: Props) {
           {task.dueDate && (
             <span
               className={`text-xs flex-shrink-0 px-2 py-0.5 rounded-full
-                ${overdue && !task.completed ? "bg-red-500/15 text-red-400" : "bg-surface text-gray-500"}`}
+                ${overdue && !task.completed ? "bg-red-500/15 text-red-400" : "bg-surface text-fg-3"}`}
             >
               {formatDueDate(task.dueDate)}
             </span>
@@ -140,7 +140,7 @@ export function TaskItem({ task }: Props) {
 
           {/* Subtask count */}
           {task.subtasks.length > 0 && (
-            <span className="text-xs text-gray-500 flex-shrink-0">
+            <span className="text-xs text-fg-3 flex-shrink-0">
               {completedSubtasks}/{task.subtasks.length}
             </span>
           )}
@@ -150,7 +150,7 @@ export function TaskItem({ task }: Props) {
             {/* Edit */}
             <button
               onClick={() => setModal({ open: true })}
-              className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors"
+              className="p-1.5 text-fg-3 hover:text-fg-2 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -159,7 +159,7 @@ export function TaskItem({ task }: Props) {
             {/* Expand toggle */}
             <button
               onClick={() => setExpanded((v) => !v)}
-              className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors"
+              className="p-1.5 text-fg-3 hover:text-fg-2 transition-colors"
             >
               <svg
                 className={`w-4 h-4 transition-transform ${expanded ? "rotate-180" : ""}`}
@@ -185,7 +185,7 @@ export function TaskItem({ task }: Props) {
             ))}
             <button
               onClick={() => setModal({ open: true, addSubtask: true })}
-              className="ml-8 mt-1 text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1"
+              className="ml-8 mt-1 text-xs text-fg-3 hover:text-fg-2 transition-colors flex items-center gap-1"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

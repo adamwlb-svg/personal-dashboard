@@ -80,32 +80,32 @@ export function ExerciseLog({ workouts }: Props) {
     <div className="bg-surface-raised border border-emerald-500/20 rounded-xl p-4 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
+        <span className="text-sm font-medium text-fg-2 flex items-center gap-1.5">
           <span>🏃</span> Exercise
         </span>
         <div className="flex items-center gap-2">
-          <span className={`text-lg font-bold ${totalMinutes > 0 ? "text-emerald-400" : "text-gray-600"}`}>
+          <span className={`text-lg font-bold ${totalMinutes > 0 ? "text-emerald-400" : "text-fg-3"}`}>
             {totalMinutes > 0 ? `${totalMinutes} min` : "—"}
           </span>
-          <span className="text-xs text-gray-600">this week</span>
+          <span className="text-xs text-fg-3">this week</span>
         </div>
       </div>
 
       {/* Week navigator */}
       <div className="flex items-center justify-between bg-surface rounded-lg px-3 py-2">
         <button onClick={() => setWeekOffset((o) => o - 1)}
-          className="text-gray-500 hover:text-gray-300 transition-colors p-0.5">
+          className="text-fg-3 hover:text-fg-2 transition-colors p-0.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <div className="text-center">
-          <p className="text-xs font-medium text-gray-300">{isCurrentWeek ? "This Week" : weekOffset === -1 ? "Last Week" : "Week of"}</p>
-          <p className="text-xs text-gray-500">{formatWeekRange()}</p>
+          <p className="text-xs font-medium text-fg-2">{isCurrentWeek ? "This Week" : weekOffset === -1 ? "Last Week" : "Week of"}</p>
+          <p className="text-xs text-fg-3">{formatWeekRange()}</p>
         </div>
         <button onClick={() => setWeekOffset((o) => Math.min(0, o + 1))}
           disabled={isCurrentWeek}
-          className="text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-30 p-0.5">
+          className="text-fg-3 hover:text-fg-2 transition-colors disabled:opacity-30 p-0.5">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -118,12 +118,12 @@ export function ExerciseLog({ workouts }: Props) {
           const dayWorkouts = byDay[idx] ?? [];
           return (
             <div key={day} className="flex items-start gap-2 min-h-[28px]">
-              <span className={`text-xs w-8 flex-shrink-0 mt-1.5 ${dayWorkouts.length > 0 ? "text-gray-400" : "text-gray-700"}`}>
+              <span className={`text-xs w-8 flex-shrink-0 mt-1.5 ${dayWorkouts.length > 0 ? "text-fg-2" : "text-fg-4"}`}>
                 {day}
               </span>
               <div className="flex-1 flex flex-wrap gap-1 py-0.5">
                 {dayWorkouts.length === 0 ? (
-                  <span className="text-xs text-gray-700 mt-1">—</span>
+                  <span className="text-xs text-fg-4 mt-1">—</span>
                 ) : (
                   dayWorkouts.map((w) => (
                     <span key={w.id}
@@ -141,7 +141,7 @@ export function ExerciseLog({ workouts }: Props) {
               </div>
               <div className="flex-shrink-0 w-12 text-right">
                 {dayWorkouts.length > 0 && (
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-fg-3">
                     {dayWorkouts.reduce((s, w) => s + w.minutes, 0)}m
                   </span>
                 )}
@@ -159,12 +159,12 @@ export function ExerciseLog({ workouts }: Props) {
               onChange={(e) => { setActivity(e.target.value); setShowSuggestions(true); }}
               onFocus={() => setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
+              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
             {showSuggestions && suggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised border border-surface-border rounded-lg shadow-xl z-10 overflow-hidden">
                 {suggestions.slice(0, 5).map((s) => (
                   <button key={s} type="button" onMouseDown={() => { setActivity(s); setShowSuggestions(false); }}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-surface hover:text-white transition-colors">
+                    className="w-full text-left px-3 py-2 text-sm text-fg-2 hover:bg-surface hover:text-fg transition-colors">
                     {s}
                   </button>
                 ))}
@@ -175,18 +175,18 @@ export function ExerciseLog({ workouts }: Props) {
             <div className="relative w-24">
               <input type="number" min="1" placeholder="Min" value={minutes}
                 onChange={(e) => setMinutes(e.target.value)}
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 pr-8 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-600">min</span>
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 pr-8 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
+              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-fg-3">min</span>
             </div>
             <input type="date" value={logDate} onChange={(e) => setLogDate(e.target.value)}
-              className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50" />
+              className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg focus:outline-none focus:border-emerald-500/50" />
             <button type="submit" disabled={saving || !activity.trim() || !minutes}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-fg text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
               {saving ? "…" : "Log"}
             </button>
           </div>
           <input type="text" placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
+            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-emerald-500/50" />
         </form>
       )}
     </div>

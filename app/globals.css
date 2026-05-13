@@ -9,6 +9,10 @@
   --surface-border: #2a2d3a;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
+  --fg: #ffffff;
+  --fg-2: #9ca3af;
+  --fg-3: #6b7280;
+  --fg-4: #374151;
 }
 
 * {
@@ -16,7 +20,8 @@
 }
 
 body {
-  @apply bg-surface text-gray-100 antialiased;
+  @apply bg-surface antialiased;
+  color: var(--fg);
 }
 
 /* Custom scrollbar */

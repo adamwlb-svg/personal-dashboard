@@ -19,6 +19,12 @@ const config: Config = {
           DEFAULT: "var(--accent)",
           hover: "var(--accent-hover)",
         },
+        fg: {
+          DEFAULT: "var(--fg)",
+          2: "var(--fg-2)",
+          3: "var(--fg-3)",
+          4: "var(--fg-4)",
+        },
       },
     },
   },

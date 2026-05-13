@@ -80,7 +80,7 @@ export function Sidebar() {
     <aside className="w-60 flex-shrink-0 bg-surface-raised border-r border-surface-border flex flex-col">
       {/* Logo / brand */}
       <div className="h-16 flex items-center px-6 border-b border-surface-border">
-        <span className="text-lg font-semibold tracking-tight text-white">
+        <span className="text-lg font-semibold tracking-tight text-fg">
           Dashboard
         </span>
       </div>
@@ -100,7 +100,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-accent/10 text-accent"
-                  : "text-gray-400 hover:text-gray-100 hover:bg-white/5"
+                  : "text-fg-2 hover:text-fg hover:bg-white/5"
               }`}
             >
               {item.icon}
@@ -121,7 +121,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-accent/10 text-accent"
-                  : "text-gray-400 hover:text-gray-100 hover:bg-white/5"
+                  : "text-fg-2 hover:text-fg hover:bg-white/5"
               }`}
             >
               {item.icon}

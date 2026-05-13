@@ -9,7 +9,7 @@ type Props = {
 export function NetWorthChart({ data }: Props) {
   if (data.length < 2) {
     return (
-      <div className="flex items-center justify-center h-24 text-xs text-gray-600">
+      <div className="flex items-center justify-center h-24 text-xs text-fg-3">
         Add more accounts and update balances to see your net worth trend.
       </div>
     );
@@ -77,7 +77,7 @@ export function NetWorthChart({ data }: Props) {
         ))}
       </svg>
       {/* Min / Max callouts */}
-      <div className="flex items-center justify-between text-xs text-gray-600 mt-0.5 px-0.5">
+      <div className="flex items-center justify-between text-xs text-fg-3 mt-0.5 px-0.5">
         <span>{formatCurrency(min, true)}</span>
         <span>{formatCurrency(max, true)}</span>
       </div>

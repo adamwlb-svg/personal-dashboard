@@ -56,7 +56,7 @@ export function SupplementTracker({ supplements, dailyStack }: Props) {
     <div className="bg-surface-raised border border-pink-500/20 rounded-xl flex flex-col">
       {/* Header + tabs */}
       <div className="flex items-center justify-between px-4 pt-4 pb-0">
-        <span className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
+        <span className="text-sm font-medium text-fg-2 flex items-center gap-1.5">
           <span>💊</span> Supplements
         </span>
         <div className="flex items-center gap-1 bg-surface rounded-lg p-0.5">
@@ -65,7 +65,7 @@ export function SupplementTracker({ supplements, dailyStack }: Props) {
               key={t}
               onClick={() => setTab(t)}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors
-                ${tab === t ? "bg-surface-raised text-white" : "text-gray-500 hover:text-gray-300"}`}
+                ${tab === t ? "bg-surface-raised text-fg" : "text-fg-3 hover:text-fg-2"}`}
             >
               {t === "today" ? "Today" : "Daily Stack"}
             </button>
@@ -145,12 +145,12 @@ function TodayTab({
       {activeDailyStack.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500">Daily stack</p>
+            <p className="text-xs text-fg-3">Daily stack</p>
             {unlogged.length > 0 && (
               <button
                 onClick={onLogAll}
                 disabled={loggingAll}
-                className="text-xs px-2 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="text-xs px-2 py-1 bg-pink-600 hover:bg-pink-500 text-fg rounded-lg transition-colors disabled:opacity-50"
               >
                 {loggingAll ? "Logging…" : `Log all (${unlogged.length})`}
               </button>
@@ -172,16 +172,16 @@ function TodayTab({
                       ${todayEntry ? "bg-pink-500 border-pink-500" : "border-surface-border hover:border-pink-400"}`}
                   >
                     {todayEntry && (
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-fg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                   </button>
-                  <span className={`text-sm flex-1 ${todayEntry ? "text-gray-400 line-through" : "text-gray-200"}`}>
+                  <span className={`text-sm flex-1 ${todayEntry ? "text-fg-2 line-through" : "text-fg"}`}>
                     {s.name}
                   </span>
                   {s.amount > 0 && (
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs text-fg-3">
                       {s.amount % 1 === 0 ? s.amount.toFixed(0) : s.amount}{s.unit}
                     </span>
                   )}
@@ -193,7 +193,7 @@ function TodayTab({
       )}
 
       {activeDailyStack.length === 0 && todayEntries.length === 0 && (
-        <p className="text-xs text-gray-600 text-center py-2">
+        <p className="text-xs text-fg-3 text-center py-2">
           Set up your Daily Stack to log supplements in one click.
         </p>
       )}
@@ -201,16 +201,16 @@ function TodayTab({
       {/* Extra entries logged today (not from daily stack) */}
       {todayEntries.filter((e) => !dailyStack.some((s) => s.name.toLowerCase() === e.name.toLowerCase())).length > 0 && (
         <div className="space-y-1 pt-1 border-t border-surface-border">
-          <p className="text-xs text-gray-500">Other today</p>
+          <p className="text-xs text-fg-3">Other today</p>
           {todayEntries
             .filter((e) => !dailyStack.some((s) => s.name.toLowerCase() === e.name.toLowerCase()))
             .map((e) => (
               <div key={e.id} className="flex items-center gap-2 group">
-                <span className="text-sm text-gray-400 flex-1">{e.name}</span>
+                <span className="text-sm text-fg-2 flex-1">{e.name}</span>
                 {e.amount > 0 && (
-                  <span className="text-xs text-gray-600">{e.amount % 1 === 0 ? e.amount.toFixed(0) : e.amount}{e.unit}</span>
+                  <span className="text-xs text-fg-3">{e.amount % 1 === 0 ? e.amount.toFixed(0) : e.amount}{e.unit}</span>
                 )}
-                <button onClick={() => onUnlog(e.id)} className="text-gray-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                <button onClick={() => onUnlog(e.id)} className="text-fg-4 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -222,7 +222,7 @@ function TodayTab({
 
       {/* One-off add form */}
       <form onSubmit={handleLog} className="border-t border-surface-border pt-3 space-y-2">
-        <p className="text-xs text-gray-500">Log a one-off supplement</p>
+        <p className="text-xs text-fg-3">Log a one-off supplement</p>
         <div className="relative">
           <input
             type="text"
@@ -231,13 +231,13 @@ function TodayTab({
             onChange={(e) => { setName(e.target.value); setShowSuggestions(true); }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
+            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-pink-500/50"
           />
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised border border-surface-border rounded-lg shadow-xl z-10 overflow-hidden">
               {suggestions.slice(0, 5).map((s) => (
                 <button key={s} type="button" onMouseDown={() => { setName(s); setShowSuggestions(false); }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-surface hover:text-white transition-colors">
+                  className="w-full text-left px-3 py-2 text-sm text-fg-2 hover:bg-surface hover:text-fg transition-colors">
                   {s}
                 </button>
               ))}
@@ -247,13 +247,13 @@ function TodayTab({
         <div className="flex gap-2">
           <input type="number" step="any" min="0" placeholder="Amount" value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-20 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
+            className="w-20 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
           <select value={unit} onChange={(e) => setUnit(e.target.value)}
-            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500/50">
+            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg focus:outline-none focus:border-pink-500/50">
             {SUPPLEMENT_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
           </select>
           <button type="submit" disabled={saving || !name.trim()}
-            className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
+            className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-fg text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
             {saving ? "…" : "Log"}
           </button>
         </div>
@@ -299,12 +299,12 @@ function StackTab({ dailyStack }: { dailyStack: SerializedDailySupplement[] }) {
 
   return (
     <>
-      <p className="text-xs text-gray-500 leading-relaxed">
+      <p className="text-xs text-fg-3 leading-relaxed">
         Define your regular supplement routine. Each day, go to the Today tab and log them all with one tap.
       </p>
 
       {dailyStack.length === 0 && (
-        <p className="text-xs text-gray-600 text-center py-2">No daily supplements yet. Add your first below.</p>
+        <p className="text-xs text-fg-3 text-center py-2">No daily supplements yet. Add your first below.</p>
       )}
 
       <div className="space-y-1.5">
@@ -316,17 +316,17 @@ function StackTab({ dailyStack }: { dailyStack: SerializedDailySupplement[] }) {
                 ${s.isActive ? "bg-pink-500 border-pink-500" : "border-surface-border"}`}
             >
               {s.isActive && (
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-fg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
               )}
             </button>
-            <span className={`text-sm flex-1 ${s.isActive ? "text-white" : "text-gray-500"}`}>{s.name}</span>
+            <span className={`text-sm flex-1 ${s.isActive ? "text-fg" : "text-fg-3"}`}>{s.name}</span>
             {s.amount > 0 && (
-              <span className="text-xs text-gray-500">{s.amount % 1 === 0 ? s.amount.toFixed(0) : s.amount}{s.unit}</span>
+              <span className="text-xs text-fg-3">{s.amount % 1 === 0 ? s.amount.toFixed(0) : s.amount}{s.unit}</span>
             )}
             <button onClick={() => handleDelete(s.id)}
-              className="text-gray-700 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all ml-1">
+              className="text-fg-4 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all ml-1">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -342,12 +342,12 @@ function StackTab({ dailyStack }: { dailyStack: SerializedDailySupplement[] }) {
             onChange={(e) => { setName(e.target.value); setShowSuggestions(true); }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
+            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
           {showSuggestions && suggestions.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised border border-surface-border rounded-lg shadow-xl z-10 overflow-hidden">
               {suggestions.slice(0, 5).map((s) => (
                 <button key={s} type="button" onMouseDown={() => { setName(s); setShowSuggestions(false); }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:bg-surface hover:text-white transition-colors">
+                  className="w-full text-left px-3 py-2 text-sm text-fg-2 hover:bg-surface hover:text-fg transition-colors">
                   {s}
                 </button>
               ))}
@@ -357,13 +357,13 @@ function StackTab({ dailyStack }: { dailyStack: SerializedDailySupplement[] }) {
         <div className="flex gap-2">
           <input type="number" step="any" min="0" placeholder="Amount" value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-20 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
+            className="w-20 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-pink-500/50" />
           <select value={unit} onChange={(e) => setUnit(e.target.value)}
-            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500/50">
+            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg focus:outline-none focus:border-pink-500/50">
             {SUPPLEMENT_UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
           </select>
           <button type="submit" disabled={saving || !name.trim()}
-            className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
+            className="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-fg text-sm font-medium rounded-lg transition-colors disabled:opacity-50">
             {saving ? "…" : "Add"}
           </button>
         </div>

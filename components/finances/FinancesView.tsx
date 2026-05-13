@@ -109,9 +109,9 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
         <div className="bg-surface-raised border border-surface-border rounded-2xl p-5 space-y-4">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Net Worth</p>
+              <p className="text-xs text-fg-3 uppercase tracking-wider mb-1">Net Worth</p>
               <div className="flex items-baseline gap-3">
-                <p className={`text-4xl font-bold tracking-tight ${netWorth >= 0 ? "text-white" : "text-red-400"}`}>
+                <p className={`text-4xl font-bold tracking-tight ${netWorth >= 0 ? "text-fg" : "text-red-400"}`}>
                   {formatCurrency(netWorth)}
                 </p>
                 {monthChange !== null && (
@@ -125,7 +125,7 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
               <PlaidConnect connectedCount={plaidConnectedCount} />
               <button
                 onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -156,12 +156,12 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
         {/* ── Allocation + Goals ────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-5">
-            <h3 className="text-sm font-semibold text-white mb-4">Asset Allocation</h3>
+            <h3 className="text-sm font-semibold text-fg mb-4">Asset Allocation</h3>
             <AllocationBar slices={allocation} total={assets} />
           </div>
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-white">Financial Goals</h3>
+              <h3 className="text-sm font-semibold text-fg">Financial Goals</h3>
               <button
                 onClick={() => { setEditingGoal(null); setShowGoalModal(true); }}
                 className="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1"
@@ -174,7 +174,7 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
             </div>
             {goals.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-6 text-center">
-                <p className="text-xs text-gray-500">Set savings goals — emergency fund, vacation, home down payment, and more.</p>
+                <p className="text-xs text-fg-3">Set savings goals — emergency fund, vacation, home down payment, and more.</p>
                 <button
                   onClick={() => { setEditingGoal(null); setShowGoalModal(true); }}
                   className="mt-3 text-xs text-accent hover:underline"
@@ -200,13 +200,13 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
         {accounts.length === 0 ? (
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-10 text-center">
             <p className="text-2xl mb-2">💳</p>
-            <p className="text-sm font-medium text-gray-300">No accounts yet</p>
-            <p className="text-xs text-gray-500 mt-1 mb-4">
+            <p className="text-sm font-medium text-fg-2">No accounts yet</p>
+            <p className="text-xs text-fg-3 mt-1 mb-4">
               Add your checking, savings, investments, and debts to track your net worth.
             </p>
             <button
               onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-              className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
             >
               Add your first account
             </button>
@@ -260,9 +260,9 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
 function MetricCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
   return (
     <div className="bg-surface-raised border border-surface-border rounded-xl p-4">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
+      <p className="text-xs text-fg-3 mb-1">{label}</p>
       <p className={`text-xl font-bold ${color}`}>{value}</p>
-      <p className="text-xs text-gray-600 mt-0.5">{sub}</p>
+      <p className="text-xs text-fg-3 mt-0.5">{sub}</p>
     </div>
   );
 }
@@ -279,12 +279,12 @@ function GoalRow({ goal, onEdit }: { goal: SerializedGoal; onEdit: () => void })
       <div className="flex items-center justify-between">
         <button onClick={onEdit} className="flex items-center gap-2 group text-left">
           <span className="text-base">{goal.emoji}</span>
-          <span className="text-sm text-gray-200 group-hover:text-white transition-colors">{goal.name}</span>
+          <span className="text-sm text-fg group-hover:text-fg transition-colors">{goal.name}</span>
         </button>
         <div className="text-right">
-          <span className="text-xs font-medium text-gray-300">{pct.toFixed(0)}%</span>
+          <span className="text-xs font-medium text-fg-2">{pct.toFixed(0)}%</span>
           {daysLeft !== null && (
-            <span className={`text-xs ml-2 ${daysLeft < 30 ? "text-yellow-400" : "text-gray-500"}`}>
+            <span className={`text-xs ml-2 ${daysLeft < 30 ? "text-yellow-400" : "text-fg-3"}`}>
               {daysLeft > 0 ? `${daysLeft}d left` : "Past due"}
             </span>
           )}
@@ -296,7 +296,7 @@ function GoalRow({ goal, onEdit }: { goal: SerializedGoal; onEdit: () => void })
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="flex items-center justify-between text-xs text-gray-600">
+      <div className="flex items-center justify-between text-xs text-fg-3">
         <span>{formatCurrency(goal.currentAmount, true)} saved</span>
         <span>{remaining > 0 ? `${formatCurrency(remaining, true)} to go` : "Complete!"}</span>
       </div>
@@ -320,7 +320,7 @@ function AccountGroup({ title, total, accounts, sparklineData, editingBalance, s
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{title}</h2>
+        <h2 className="text-xs font-semibold text-fg-3 uppercase tracking-wider">{title}</h2>
         <span className={`text-sm font-semibold ${isLiability ? "text-red-400" : "text-emerald-400"}`}>
           {formatCurrency(total)}
         </span>
@@ -379,13 +379,13 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
         <div className="flex items-center gap-2">
           <span className="text-lg">{meta?.icon ?? "📂"}</span>
           <div>
-            <p className="text-sm font-medium text-white leading-tight">{account.name}</p>
-            {account.institution && <p className="text-xs text-gray-500">{account.institution}</p>}
+            <p className="text-sm font-medium text-fg leading-tight">{account.name}</p>
+            {account.institution && <p className="text-xs text-fg-3">{account.institution}</p>}
           </div>
         </div>
         <div className="flex items-center gap-1">
           <SparklineSvg />
-          <button onClick={() => onEdit(account)} className="text-gray-600 hover:text-gray-400 transition-colors ml-1" aria-label="Edit">
+          <button onClick={() => onEdit(account)} className="text-fg-3 hover:text-fg-2 transition-colors ml-1" aria-label="Edit">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -397,7 +397,7 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
       {isEditing ? (
         <div className="flex gap-1">
           <div className="relative flex-1">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-fg-2 text-xs">$</span>
             <input
               type="number"
               step="0.01"
@@ -408,10 +408,10 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
                 if (e.key === "Enter") onBalanceSave(account.id);
                 if (e.key === "Escape") setEditingBalance(null);
               }}
-              className="w-full bg-surface border border-accent rounded-lg pl-5 pr-2 py-1.5 text-white text-sm focus:outline-none"
+              className="w-full bg-surface border border-accent rounded-lg pl-5 pr-2 py-1.5 text-fg text-sm focus:outline-none"
             />
           </div>
-          <button onClick={() => onBalanceSave(account.id)} className="px-2 py-1.5 bg-accent rounded-lg text-white text-xs font-medium">
+          <button onClick={() => onBalanceSave(account.id)} className="px-2 py-1.5 bg-accent rounded-lg text-fg text-xs font-medium">
             Save
           </button>
         </div>
@@ -420,10 +420,10 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
           onClick={() => setEditingBalance({ id: account.id, value: Math.abs(account.balance).toString() })}
           className="text-left group"
         >
-          <p className={`text-xl font-bold ${meta?.color ?? "text-gray-400"}`}>
+          <p className={`text-xl font-bold ${meta?.color ?? "text-fg-2"}`}>
             {meta?.isLiability ? formatCurrency(Math.abs(account.balance)) : formatCurrency(account.balance)}
           </p>
-          <p className="text-xs text-gray-600 group-hover:text-gray-400 transition-colors">
+          <p className="text-xs text-fg-3 group-hover:text-fg-2 transition-colors">
             Click to update balance
           </p>
         </button>
@@ -439,7 +439,7 @@ function AccountCard({ account, sparkline, editingBalance, setEditingBalance, on
             Live
           </span>
         )}
-        {account.notes && <span className="text-xs text-gray-600 truncate">{account.notes}</span>}
+        {account.notes && <span className="text-xs text-fg-3 truncate">{account.notes}</span>}
       </div>
     </div>
   );

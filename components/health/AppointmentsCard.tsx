@@ -17,12 +17,12 @@ export function AppointmentsCard({
 }) {
   return (
     <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+      <h3 className="text-sm font-semibold text-fg mb-4 flex items-center gap-2">
         🏥 Upcoming Health Appointments
       </h3>
 
       {appointments.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-4">
+        <p className="text-sm text-fg-3 text-center py-4">
           No upcoming health appointments — add one in Schedule.
         </p>
       ) : (
@@ -34,14 +34,14 @@ export function AppointmentsCard({
             >
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-100 truncate">
+                <p className="text-sm font-medium text-fg truncate">
                   {appt.title}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-fg-3 mt-0.5">
                   {formatApptDate(appt.startTime)}
                 </p>
                 {appt.location && (
-                  <p className="text-xs text-gray-600 truncate mt-0.5">
+                  <p className="text-xs text-fg-3 truncate mt-0.5">
                     📍 {appt.location}
                   </p>
                 )}

@@ -62,10 +62,10 @@ export function GoalModal({ goal, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface-border">
-          <h2 className="text-base font-semibold text-white">
+          <h2 className="text-base font-semibold text-fg">
             {isEditing ? "Edit Goal" : "New Goal"}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors">
+          <button onClick={onClose} className="text-fg-3 hover:text-fg-2 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -75,7 +75,7 @@ export function GoalModal({ goal, onClose }: Props) {
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {/* Emoji picker */}
           <div>
-            <label className="text-xs text-gray-500 mb-2 block">Icon</label>
+            <label className="text-xs text-fg-3 mb-2 block">Icon</label>
             <div className="flex flex-wrap gap-2">
               {EMOJI_OPTIONS.map((e) => (
                 <button
@@ -93,7 +93,7 @@ export function GoalModal({ goal, onClose }: Props) {
 
           {/* Name */}
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">Goal Name</label>
+            <label className="text-xs text-fg-3 mb-1 block">Goal Name</label>
             <input
               type="text"
               placeholder='e.g. "Emergency Fund"'
@@ -101,16 +101,16 @@ export function GoalModal({ goal, onClose }: Props) {
               onChange={(e) => setName(e.target.value)}
               required
               autoFocus
-              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
             />
           </div>
 
           {/* Amounts */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Target Amount</label>
+              <label className="text-xs text-fg-3 mb-1 block">Target Amount</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-2 text-sm">$</span>
                 <input
                   type="number"
                   step="0.01"
@@ -118,21 +118,21 @@ export function GoalModal({ goal, onClose }: Props) {
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
                   required
-                  className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+                  className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Saved So Far</label>
+              <label className="text-xs text-fg-3 mb-1 block">Saved So Far</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-2 text-sm">$</span>
                 <input
                   type="number"
                   step="0.01"
                   placeholder="0"
                   value={current}
                   onChange={(e) => setCurrent(e.target.value)}
-                  className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+                  className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -140,12 +140,12 @@ export function GoalModal({ goal, onClose }: Props) {
 
           {/* Target date */}
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">Target Date (optional)</label>
+            <label className="text-xs text-fg-3 mb-1 block">Target Date (optional)</label>
             <input
               type="date"
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
-              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent"
+              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
             />
           </div>
 
@@ -162,13 +162,13 @@ export function GoalModal({ goal, onClose }: Props) {
               </button>
             )}
             <div className="flex-1" />
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors">
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-fg-2 hover:text-fg transition-colors">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim() || !target}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-fg transition-colors disabled:opacity-50"
             >
               {saving ? "Saving…" : isEditing ? "Update" : "Add Goal"}
             </button>

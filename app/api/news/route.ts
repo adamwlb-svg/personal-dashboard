@@ -2,15 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-const SECTION_MAP: Record<string, string> = {
-  top: "news",
-  politics: "politics",
-  business: "business",
-  technology: "technology",
-  culture: "culture",
-  sport: "sport",
-};
-
 export type NewsArticle = {
   id: string;
   title: string;
@@ -22,6 +13,15 @@ export type NewsArticle = {
   byline: string | null;
 };
 
+const SECTION_MAP: Record<string, string | null> = {
+  top:        null, // no filter — all sections
+  politics:   "politics",
+  business:   "business",
+  technology: "technology",
+  culture:    "culture",
+  sport:      "sport",
+};
+
 export async function GET(req: NextRequest) {
   const apiKey = process.env.GUARDIAN_API_KEY;
   if (!apiKey) {
@@ -30,29 +30,32 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("category") ?? "top";
-  const section = SECTION_MAP[category] ?? "news";
+  const section = SECTION_MAP[category] ?? null;
 
-  const params = new URLSearchParams({
+  const params: Record<string, string> = {
     "api-key": apiKey,
     "show-fields": "trailText,thumbnail,byline",
     "page-size": "20",
     "order-by": "newest",
-  });
+  };
+  if (section) params["section"] = section;
 
-  if (category === "top") {
-    params.set("section", "news|politics|business|technology|culture|sport");
-  } else {
-    params.set("section", section);
-  }
+  const qs = new URLSearchParams(params).toString();
+  const url = `https://content.guardianapis.com/search?${qs}`;
 
   try {
-    const res = await fetch(`https://content.guardianapis.com/search?${params}`, {
-      next: { revalidate: 300 },
-    });
+    const res = await fetch(url, { cache: "no-store" });
+    const text = await res.text();
+
     if (!res.ok) {
-      return NextResponse.json({ configured: true, articles: [], error: "Guardian API error" });
+      return NextResponse.json({
+        configured: true,
+        articles: [],
+        error: `Guardian API returned ${res.status}: ${text.slice(0, 200)}`,
+      });
     }
-    const data = await res.json();
+
+    const data = JSON.parse(text);
     const articles: NewsArticle[] = (data.response?.results ?? []).map((item: {
       id: string;
       webTitle: string;
@@ -70,8 +73,13 @@ export async function GET(req: NextRequest) {
       trailText: item.fields?.trailText ?? null,
       byline: item.fields?.byline ?? null,
     }));
+
     return NextResponse.json({ configured: true, articles });
-  } catch {
-    return NextResponse.json({ configured: true, articles: [], error: "Fetch failed" });
+  } catch (err) {
+    return NextResponse.json({
+      configured: true,
+      articles: [],
+      error: `Fetch failed: ${err instanceof Error ? err.message : String(err)}`,
+    });
   }
 }

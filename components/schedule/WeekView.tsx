@@ -60,12 +60,12 @@ export function WeekView({
             key={day.toISOString()}
             className="flex-1 py-2 text-center border-l border-surface-border"
           >
-            <p className="text-xs text-gray-500 uppercase">
+            <p className="text-xs text-fg-3 uppercase">
               {format(day, "EEE")}
             </p>
             <p
               className={`text-sm font-semibold mx-auto w-7 h-7 flex items-center justify-center rounded-full mt-0.5
-              ${isToday(day) ? "bg-accent text-white" : "text-gray-300"}`}
+              ${isToday(day) ? "bg-accent text-fg" : "text-fg-2"}`}
             >
               {format(day, "d")}
             </p>
@@ -83,7 +83,7 @@ export function WeekView({
           {hours.map((hour) => (
             <div
               key={hour}
-              className="absolute right-2 text-xs text-gray-600"
+              className="absolute right-2 text-xs text-fg-3"
               style={{ top: (hour - START_HOUR) * HOUR_PX - 8 }}
             >
               {format(new Date(2024, 0, 1, hour), "h a")}

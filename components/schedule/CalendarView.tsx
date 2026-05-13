@@ -111,7 +111,7 @@ export function CalendarView({
         <div className="flex items-center gap-2 px-5 py-3 border-b border-surface-border flex-shrink-0 bg-surface-raised">
           <button
             onClick={() => setCurrentDate(new Date())}
-            className="px-3 py-1.5 text-sm font-medium border border-surface-border rounded-lg text-gray-300 hover:bg-white/5 transition-colors"
+            className="px-3 py-1.5 text-sm font-medium border border-surface-border rounded-lg text-fg-2 hover:bg-white/5 transition-colors"
           >
             Today
           </button>
@@ -119,7 +119,7 @@ export function CalendarView({
           <div className="flex items-center">
             <button
               onClick={() => navigate("prev")}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-fg-2 hover:text-fg hover:bg-white/5 transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -137,7 +137,7 @@ export function CalendarView({
             </button>
             <button
               onClick={() => navigate("next")}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+              className="p-1.5 rounded-lg text-fg-2 hover:text-fg hover:bg-white/5 transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -155,7 +155,7 @@ export function CalendarView({
             </button>
           </div>
 
-          <h2 className="text-base font-semibold text-white min-w-[160px]">
+          <h2 className="text-base font-semibold text-fg min-w-[160px]">
             {heading}
           </h2>
 
@@ -168,7 +168,7 @@ export function CalendarView({
                 key={v}
                 onClick={() => setView(v)}
                 className={`px-3 py-1 rounded-md font-medium transition-colors capitalize
-                  ${view === v ? "bg-accent/20 text-accent" : "text-gray-400 hover:text-gray-200"}`}
+                  ${view === v ? "bg-accent/20 text-accent" : "text-fg-2 hover:text-fg"}`}
               >
                 {v}
               </button>
@@ -177,7 +177,7 @@ export function CalendarView({
 
           <button
             onClick={() => openNew()}
-            className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
           >
             <svg
               className="w-4 h-4"

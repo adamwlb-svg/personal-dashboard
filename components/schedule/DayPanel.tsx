@@ -26,16 +26,16 @@ export function DayPanel({
     <div className="w-72 flex-shrink-0 bg-surface-raised border-l border-surface-border flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-surface-border">
         <div>
-          <p className="text-xs text-gray-500 uppercase tracking-wider">
+          <p className="text-xs text-fg-3 uppercase tracking-wider">
             {format(date, "EEEE")}
           </p>
-          <p className="text-lg font-semibold text-white">
+          <p className="text-lg font-semibold text-fg">
             {format(date, "MMMM d")}
           </p>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-300 transition-colors p-1"
+          className="text-fg-3 hover:text-fg-2 transition-colors p-1"
         >
           <svg
             className="w-4 h-4"
@@ -55,7 +55,7 @@ export function DayPanel({
 
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {dayEvents.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-10">
+          <p className="text-sm text-fg-3 text-center py-10">
             No events scheduled
           </p>
         ) : (
@@ -75,15 +75,15 @@ export function DayPanel({
                   {event.title}
                 </p>
                 {event.allDay ? (
-                  <p className="text-xs text-gray-400 mt-0.5">All day</p>
+                  <p className="text-xs text-fg-2 mt-0.5">All day</p>
                 ) : (
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-fg-2 mt-0.5">
                     {format(event.startTime, "h:mm a")} –{" "}
                     {format(event.endTime, "h:mm a")}
                   </p>
                 )}
                 {event.location && (
-                  <p className="text-xs text-gray-500 mt-1 truncate">
+                  <p className="text-xs text-fg-3 mt-1 truncate">
                     📍 {event.location}
                   </p>
                 )}
@@ -96,7 +96,7 @@ export function DayPanel({
       <div className="p-3 border-t border-surface-border">
         <button
           onClick={() => onNewEvent(date)}
-          className="w-full py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-sm font-medium transition-colors"
+          className="w-full py-2 rounded-lg bg-accent hover:bg-accent-hover text-fg text-sm font-medium transition-colors"
         >
           + Add Event
         </button>

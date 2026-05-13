@@ -170,12 +170,12 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border">
-          <h2 className="text-base font-semibold text-white">
+          <h2 className="text-base font-semibold text-fg">
             {isEditing ? "Edit Event" : "New Event"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-fg-3 hover:text-fg-2 transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -205,7 +205,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
             onChange={(e) => setTitle(e.target.value)}
             required
             autoFocus
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
           />
 
           {/* All day */}
@@ -220,13 +220,13 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                 className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${allDay ? "translate-x-4" : "translate-x-0.5"}`}
               />
             </div>
-            <span className="text-sm text-gray-400">All day</span>
+            <span className="text-sm text-fg-2">All day</span>
           </label>
 
           {/* Start / End */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Start</label>
+              <label className="text-xs text-fg-3 mb-1 block">Start</label>
               <input
                 type={allDay ? "date" : "datetime-local"}
                 value={allDay ? startTime.slice(0, 10) : startTime}
@@ -235,11 +235,11 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                     allDay ? e.target.value + "T00:00" : e.target.value
                   )
                 }
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">End</label>
+              <label className="text-xs text-fg-3 mb-1 block">End</label>
               <input
                 type={allDay ? "date" : "datetime-local"}
                 value={allDay ? endTime.slice(0, 10) : endTime}
@@ -248,14 +248,14 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                     allDay ? e.target.value + "T23:59" : e.target.value
                   )
                 }
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
               />
             </div>
           </div>
 
           {/* Category */}
           <div>
-            <label className="text-xs text-gray-500 mb-2 block">
+            <label className="text-xs text-fg-3 mb-2 block">
               Category
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -270,7 +270,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                   type="button"
                   onClick={() => setCategory(key)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all border
-                    ${category === key ? `${cat.bg} ${cat.text} ${cat.border}` : "bg-surface border-surface-border text-gray-500 hover:border-gray-500"}`}
+                    ${category === key ? `${cat.bg} ${cat.text} ${cat.border}` : "bg-surface border-surface-border text-fg-3 hover:border-gray-500"}`}
                 >
                   {cat.label}
                 </button>
@@ -280,11 +280,11 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
 
           {/* Recurrence */}
           <div>
-            <label className="text-xs text-gray-500 mb-2 block">Repeat</label>
+            <label className="text-xs text-fg-3 mb-2 block">Repeat</label>
             <select
               value={recurrence}
               onChange={(e) => setRecurrence(e.target.value)}
-              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent"
+              className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
             >
               {RECURRENCE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -297,7 +297,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
           {/* Custom day picker */}
           {recurrence === "custom" && (
             <div>
-              <label className="text-xs text-gray-500 mb-2 block">
+              <label className="text-xs text-fg-3 mb-2 block">
                 Repeat on
               </label>
               <div className="flex gap-1.5">
@@ -313,7 +313,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                       )
                     }
                     className={`w-8 h-8 rounded-full text-xs font-medium transition-colors
-                      ${customDays.includes(day.value) ? "bg-accent text-white" : "bg-surface border border-surface-border text-gray-400 hover:border-gray-500"}`}
+                      ${customDays.includes(day.value) ? "bg-accent text-fg" : "bg-surface border border-surface-border text-fg-2 hover:border-gray-500"}`}
                   >
                     {day.label}
                   </button>
@@ -325,7 +325,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
           {/* Recurrence end */}
           {recurrence !== "none" && (
             <div>
-              <label className="text-xs text-gray-500 mb-2 block">Ends</label>
+              <label className="text-xs text-fg-3 mb-2 block">Ends</label>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -334,7 +334,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                     onChange={() => setEndsOn(false)}
                     className="accent-indigo-500"
                   />
-                  <span className="text-sm text-gray-400">Never</span>
+                  <span className="text-sm text-fg-2">Never</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -343,14 +343,14 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
                     onChange={() => setEndsOn(true)}
                     className="accent-indigo-500"
                   />
-                  <span className="text-sm text-gray-400">On</span>
+                  <span className="text-sm text-fg-2">On</span>
                 </label>
                 {endsOn && (
                   <input
                     type="date"
                     value={endsOnDate}
                     onChange={(e) => setEndsOnDate(e.target.value)}
-                    className="bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-accent"
+                    className="bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-fg text-sm focus:outline-none focus:border-accent"
                   />
                 )}
               </div>
@@ -363,7 +363,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
             placeholder="Add location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-accent text-sm"
+            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent text-sm"
           />
 
           {/* Description */}
@@ -372,7 +372,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-accent text-sm resize-none"
+            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent text-sm resize-none"
           />
 
           {/* Footer actions */}
@@ -391,14 +391,14 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-fg-2 hover:text-fg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !title.trim()}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-fg transition-colors disabled:opacity-50"
             >
               {saving ? "Saving…" : isEditing ? "Update" : "Create"}
             </button>

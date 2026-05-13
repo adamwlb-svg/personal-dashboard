@@ -89,12 +89,12 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border">
-          <h2 className="text-base font-semibold text-white">
+          <h2 className="text-base font-semibold text-fg">
             {parentId ? "New Subtask" : isEditing ? "Edit Task" : "New Task"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-fg-3 hover:text-fg-2 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -111,7 +111,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
             onChange={(e) => setTitle(e.target.value)}
             required
             autoFocus
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
           />
 
           {/* Notes */}
@@ -120,22 +120,22 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={2}
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-accent text-sm resize-none"
+            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent text-sm resize-none"
           />
 
           {/* Due date + Priority */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Due date</label>
+              <label className="text-xs text-fg-3 mb-1 block">Due date</label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Priority</label>
+              <label className="text-xs text-fg-3 mb-1 block">Priority</label>
               <div className="flex gap-1.5">
                 {(Object.entries(PRIORITIES) as [PriorityKey, typeof PRIORITIES[PriorityKey]][]).map(
                   ([key, p]) => (
@@ -144,7 +144,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
                       type="button"
                       onClick={() => setPriority(key)}
                       className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all
-                        ${priority === key ? `${p.text} border-current bg-white/5` : "text-gray-500 border-surface-border hover:border-gray-500"}`}
+                        ${priority === key ? `${p.text} border-current bg-white/5` : "text-fg-3 border-surface-border hover:border-gray-500"}`}
                     >
                       {p.label}
                     </button>
@@ -157,7 +157,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
           {/* Category */}
           {!parentId && (
             <div>
-              <label className="text-xs text-gray-500 mb-2 block">Category</label>
+              <label className="text-xs text-fg-3 mb-2 block">Category</label>
               <div className="flex flex-wrap gap-1.5">
                 {(Object.entries(TODO_CATEGORIES) as [TodoCategoryKey, typeof TODO_CATEGORIES[TodoCategoryKey]][]).map(
                   ([key, cat]) => (
@@ -166,7 +166,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
                       type="button"
                       onClick={() => setCategory(key)}
                       className={`px-3 py-1 rounded-full text-xs font-medium border transition-all
-                        ${category === key ? `${cat.bg} ${cat.text} ${cat.border}` : "bg-surface border-surface-border text-gray-500 hover:border-gray-500"}`}
+                        ${category === key ? `${cat.bg} ${cat.text} ${cat.border}` : "bg-surface border-surface-border text-fg-3 hover:border-gray-500"}`}
                     >
                       {cat.label}
                     </button>
@@ -189,7 +189,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
                   className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${addToCalendar ? "translate-x-4" : "translate-x-0.5"}`}
                 />
               </div>
-              <span className="text-sm text-gray-400">Add to calendar</span>
+              <span className="text-sm text-fg-2">Add to calendar</span>
             </label>
           )}
 
@@ -209,14 +209,14 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-fg-2 hover:text-fg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !title.trim()}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-fg transition-colors disabled:opacity-50"
             >
               {saving ? "Saving…" : isEditing ? "Update" : "Create"}
             </button>

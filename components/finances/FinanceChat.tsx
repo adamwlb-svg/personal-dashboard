@@ -52,7 +52,7 @@ export function FinanceChat({ initialMessages, aiConfigured }: Props) {
   return (
     <div className="bg-surface-raised border border-surface-border rounded-xl flex flex-col" style={{ height: 420 }}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-surface-border flex-shrink-0">
-        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-fg flex items-center gap-2">
           🤖 Finance Assistant
         </h3>
         {aiConfigured ? (
@@ -71,15 +71,15 @@ export function FinanceChat({ initialMessages, aiConfigured }: Props) {
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
             {aiConfigured ? (
               <>
-                <p className="text-sm text-gray-300 font-medium">Ready to help</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm text-fg-2 font-medium">Ready to help</p>
+                <p className="text-xs text-fg-3 mt-1">
                   Ask about your net worth, spending strategy, savings goals, or anything about your accounts.
                 </p>
               </>
             ) : (
               <>
-                <p className="text-sm text-gray-300 font-medium">AI Finance Assistant</p>
-                <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                <p className="text-sm text-fg-2 font-medium">AI Finance Assistant</p>
+                <p className="text-xs text-fg-3 mt-2 leading-relaxed">
                   To activate, add{" "}
                   <code className="bg-surface text-accent px-1 py-0.5 rounded text-xs">ANTHROPIC_API_KEY</code>{" "}
                   to your Vercel environment variables. You&apos;ll be able to ask questions about your accounts, get savings advice, and more.
@@ -102,8 +102,8 @@ export function FinanceChat({ initialMessages, aiConfigured }: Props) {
             <div
               className={`max-w-[85%] px-3 py-2 rounded-xl text-sm leading-relaxed whitespace-pre-wrap
                 ${msg.role === "user"
-                  ? "bg-accent/20 text-white border border-accent/30"
-                  : "bg-surface border border-surface-border text-gray-200"}`}
+                  ? "bg-accent/20 text-fg border border-accent/30"
+                  : "bg-surface border border-surface-border text-fg"}`}
             >
               {msg.content}
             </div>
@@ -140,12 +140,12 @@ export function FinanceChat({ initialMessages, aiConfigured }: Props) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
             disabled={!aiConfigured || loading}
-            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-accent disabled:opacity-40 disabled:cursor-not-allowed"
           />
           <button
             onClick={handleSend}
             disabled={!aiConfigured || loading || !input.trim()}
-            className="px-3 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-3 py-2 bg-accent hover:bg-accent-hover text-fg rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Send
           </button>

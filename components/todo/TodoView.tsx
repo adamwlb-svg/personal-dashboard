@@ -62,14 +62,14 @@ export function TodoView({ tasks }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white">To-Do</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
+          <h1 className="text-2xl font-semibold text-fg">To-Do</h1>
+          <p className="text-sm text-fg-2 mt-0.5">
             {completedCount} of {totalCount} tasks complete
           </p>
         </div>
         <button
           onClick={() => setNewTaskModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -87,13 +87,13 @@ export function TodoView({ tasks }: Props) {
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1 text-right">{progressPct}% complete</p>
+          <p className="text-xs text-fg-3 mt-1 text-right">{progressPct}% complete</p>
         </div>
       )}
 
       {/* Quick add */}
       <div className="flex items-center gap-3 mb-5 bg-surface-raised border border-surface-border rounded-xl px-4 py-3">
-        <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-fg-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
         <input
@@ -103,7 +103,7 @@ export function TodoView({ tasks }: Props) {
           onChange={(e) => setQuickAdd(e.target.value)}
           onKeyDown={handleQuickAdd}
           disabled={adding}
-          className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
+          className="flex-1 bg-transparent text-sm text-fg placeholder-gray-500 focus:outline-none"
         />
       </div>
 
@@ -116,7 +116,7 @@ export function TodoView({ tasks }: Props) {
               key={f.value}
               onClick={() => setFilter(f.value)}
               className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5
-                ${filter === f.value ? "bg-accent/20 text-accent" : "text-gray-400 hover:text-gray-200"}`}
+                ${filter === f.value ? "bg-accent/20 text-accent" : "text-fg-2 hover:text-fg"}`}
             >
               {f.label}
               {badge != null && badge > 0 && (
@@ -133,7 +133,7 @@ export function TodoView({ tasks }: Props) {
       {/* Task list */}
       <div className="space-y-2">
         {visible.length === 0 ? (
-          <div className="text-center py-16 text-gray-500 text-sm">
+          <div className="text-center py-16 text-fg-3 text-sm">
             {filter === "all" && "No open tasks — add one above"}
             {filter === "today" && "Nothing due today"}
             {filter === "overdue" && "You're all caught up"}

@@ -60,13 +60,13 @@ export function MetricCard({ type, metrics }: Props) {
     <div className={`bg-surface-raised border rounded-xl p-4 flex flex-col gap-3 ${meta.border}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-400 flex items-center gap-1.5">
+        <span className="text-sm font-medium text-fg-2 flex items-center gap-1.5">
           <span>{meta.icon}</span> {meta.label}
         </span>
         <button
           onClick={() => setLogging((v) => !v)}
           className={`text-xs px-2 py-1 rounded-lg border transition-colors
-            ${logging ? "bg-surface border-surface-border text-gray-400" : `${meta.bg} ${meta.border} ${meta.color}`}`}
+            ${logging ? "bg-surface border-surface-border text-fg-2" : `${meta.bg} ${meta.border} ${meta.color}`}`}
         >
           {logging ? "Cancel" : "+ Log"}
         </button>
@@ -79,16 +79,16 @@ export function MetricCard({ type, metrics }: Props) {
             <>
               <p className={`text-2xl font-semibold ${meta.color}`}>
                 {latest.value}
-                <span className="text-sm font-normal text-gray-500 ml-1">{meta.unit}</span>
+                <span className="text-sm font-normal text-fg-3 ml-1">{meta.unit}</span>
               </p>
               {delta !== null && (
-                <p className={`text-xs mt-0.5 ${delta > 0 ? "text-emerald-400" : delta < 0 ? "text-red-400" : "text-gray-500"}`}>
+                <p className={`text-xs mt-0.5 ${delta > 0 ? "text-emerald-400" : delta < 0 ? "text-red-400" : "text-fg-3"}`}>
                   {delta > 0 ? "+" : ""}{delta.toFixed(1)} from last entry
                 </p>
               )}
             </>
           ) : (
-            <p className="text-sm text-gray-600">No data yet</p>
+            <p className="text-sm text-fg-3">No data yet</p>
           )}
         </div>
         <div className={meta.color}>
@@ -108,12 +108,12 @@ export function MetricCard({ type, metrics }: Props) {
               onChange={(e) => setValue(e.target.value)}
               autoFocus
               required
-              className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent"
+              className="flex-1 bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
             />
             <button
               type="submit"
               disabled={saving}
-              className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm rounded-lg transition-colors disabled:opacity-50"
             >
               {saving ? "…" : "Save"}
             </button>
@@ -123,7 +123,7 @@ export function MetricCard({ type, metrics }: Props) {
             placeholder="Notes (optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="bg-surface border border-surface-border rounded-lg px-3 py-1.5 text-sm text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
           />
         </form>
       )}

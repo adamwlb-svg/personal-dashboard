@@ -61,10 +61,10 @@ export function AccountModal({ account, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border">
-          <h2 className="text-base font-semibold text-white">
+          <h2 className="text-base font-semibold text-fg">
             {isEditing ? "Edit Account" : "Add Account"}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors">
+          <button onClick={onClose} className="text-fg-3 hover:text-fg-2 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -74,7 +74,7 @@ export function AccountModal({ account, onClose }: Props) {
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {/* Account type */}
           <div>
-            <label className="text-xs text-gray-500 mb-2 block">Account Type</label>
+            <label className="text-xs text-fg-3 mb-2 block">Account Type</label>
             <div className="grid grid-cols-3 gap-2">
               {(Object.entries(ACCOUNT_TYPES) as [AccountType, typeof ACCOUNT_TYPES[AccountType]][]).map(([key, t]) => (
                 <button
@@ -82,7 +82,7 @@ export function AccountModal({ account, onClose }: Props) {
                   type="button"
                   onClick={() => setType(key)}
                   className={`py-2 px-2 rounded-lg text-xs font-medium border transition-all flex flex-col items-center gap-0.5
-                    ${type === key ? `${t.bg} ${t.color} ${t.border}` : "bg-surface border-surface-border text-gray-500 hover:border-gray-500"}`}
+                    ${type === key ? `${t.bg} ${t.color} ${t.border}` : "bg-surface border-surface-border text-fg-3 hover:border-gray-500"}`}
                 >
                   <span>{t.icon}</span>
                   <span>{t.label}</span>
@@ -94,7 +94,7 @@ export function AccountModal({ account, onClose }: Props) {
           {/* Name + Institution */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Account Name</label>
+              <label className="text-xs text-fg-3 mb-1 block">Account Name</label>
               <input
                 type="text"
                 placeholder='e.g. "Main Checking"'
@@ -102,39 +102,39 @@ export function AccountModal({ account, onClose }: Props) {
                 onChange={(e) => setName(e.target.value)}
                 required
                 autoFocus
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">Institution</label>
+              <label className="text-xs text-fg-3 mb-1 block">Institution</label>
               <input
                 type="text"
                 placeholder='e.g. "Chase"'
                 value={institution}
                 onChange={(e) => setInstitution(e.target.value)}
-                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
               />
             </div>
           </div>
 
           {/* Balance */}
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">
+            <label className="text-xs text-fg-3 mb-1 block">
               {isLiability ? "Amount Owed" : "Current Balance"}
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-2 text-sm">$</span>
               <input
                 type="number"
                 step="0.01"
                 placeholder="0.00"
                 value={balance}
                 onChange={(e) => setBalance(e.target.value)}
-                className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+                className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
               />
             </div>
             {isLiability && (
-              <p className="text-xs text-gray-500 mt-1">Enter as a positive number — we&apos;ll treat it as a liability.</p>
+              <p className="text-xs text-fg-3 mt-1">Enter as a positive number — we&apos;ll treat it as a liability.</p>
             )}
           </div>
 
@@ -144,7 +144,7 @@ export function AccountModal({ account, onClose }: Props) {
             placeholder="Notes (optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-fg text-sm placeholder-gray-500 focus:outline-none focus:border-accent"
           />
 
           {/* Actions */}
@@ -160,13 +160,13 @@ export function AccountModal({ account, onClose }: Props) {
               </button>
             )}
             <div className="flex-1" />
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors">
+            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-fg-2 hover:text-fg transition-colors">
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-white transition-colors disabled:opacity-50"
+              className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-fg transition-colors disabled:opacity-50"
             >
               {saving ? "Saving…" : isEditing ? "Update" : "Add Account"}
             </button>

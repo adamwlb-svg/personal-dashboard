@@ -45,7 +45,7 @@ export function MonthGrid({
         {DAY_HEADERS.map((d) => (
           <div
             key={d}
-            className="py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            className="py-2 text-center text-xs font-medium text-fg-3 uppercase tracking-wider"
           >
             {d}
           </div>
@@ -73,9 +73,9 @@ export function MonthGrid({
               <div className="flex justify-end mb-0.5">
                 <span
                   className={`text-xs w-6 h-6 flex items-center justify-center rounded-full font-medium transition-colors
-                    ${today ? "bg-accent text-white" : ""}
-                    ${!today && inMonth ? "text-gray-300" : ""}
-                    ${!today && !inMonth ? "text-gray-600" : ""}`}
+                    ${today ? "bg-accent text-fg" : ""}
+                    ${!today && inMonth ? "text-fg-2" : ""}
+                    ${!today && !inMonth ? "text-fg-3" : ""}`}
                 >
                   {format(day, "d")}
                 </span>
@@ -108,7 +108,7 @@ export function MonthGrid({
               })}
 
               {dayEvents.length > MAX_CHIPS && (
-                <span className="text-xs text-gray-500 pl-1">
+                <span className="text-xs text-fg-3 pl-1">
                   +{dayEvents.length - MAX_CHIPS} more
                 </span>
               )}
