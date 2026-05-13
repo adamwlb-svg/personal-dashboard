@@ -11,13 +11,13 @@ const config: Config = {
     extend: {
       colors: {
         surface: {
-          DEFAULT: "#0f1117",
-          raised: "#1a1d27",
-          border: "#2a2d3a",
+          DEFAULT: "var(--surface)",
+          raised: "var(--surface-raised)",
+          border: "var(--surface-border)",
         },
         accent: {
-          DEFAULT: "#6366f1",
-          hover: "#4f46e5",
+          DEFAULT: "var(--accent)",
+          hover: "var(--accent-hover)",
         },
       },
     },

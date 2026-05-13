@@ -150,6 +150,9 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
           />
         </div>
 
+        {/* ── To-Dos ───────────────────────────────────────────── */}
+        <FinanceTodos todos={todos} />
+
         {/* ── Allocation + Goals ────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-5">
@@ -237,11 +240,8 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
           </div>
         )}
 
-        {/* ── To-Dos + Chat ─────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <FinanceTodos todos={todos} />
-          <FinanceChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
-        </div>
+        {/* ── Chat ──────────────────────────────────────────────── */}
+        <FinanceChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
 
       </div>
 

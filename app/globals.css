@@ -4,6 +4,11 @@
 
 :root {
   color-scheme: dark;
+  --surface: #0f1117;
+  --surface-raised: #1a1d27;
+  --surface-border: #2a2d3a;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
 }
 
 * {
