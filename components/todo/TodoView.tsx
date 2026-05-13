@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { SerializedTask, Filter, filterTasks, sortTasks } from "@/lib/todo";
+import {
+  SerializedTask,
+  Filter,
+  Sort,
+  filterTasks,
+  sortTasks,
+  groupByCategory,
+  TODO_CATEGORIES,
+  TodoCategoryKey,
+} from "@/lib/todo";
 import { TaskItem } from "./TaskItem";
 import { TaskModal } from "./TaskModal";
 import { createTask } from "@/app/todo/actions";
@@ -10,26 +19,33 @@ import { useRouter } from "next/navigation";
 type Props = { tasks: SerializedTask[] };
 
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "today", label: "Today" },
-  { value: "overdue", label: "Overdue" },
+  { value: "all",       label: "All" },
+  { value: "today",     label: "Today" },
+  { value: "overdue",   label: "Overdue" },
   { value: "completed", label: "Completed" },
+];
+
+const SORTS: { value: Sort; label: string; icon: string }[] = [
+  { value: "priority", label: "Priority", icon: "↑" },
+  { value: "due-date", label: "Due Date", icon: "📅" },
+  { value: "category", label: "Category", icon: "🏷️" },
 ];
 
 export function TodoView({ tasks }: Props) {
   const router = useRouter();
-  const [filter, setFilter] = useState<Filter>("all");
-  const [quickAdd, setQuickAdd] = useState("");
-  const [adding, setAdding] = useState(false);
+  const [filter, setFilter]       = useState<Filter>("all");
+  const [sort, setSort]           = useState<Sort>("priority");
+  const [quickAdd, setQuickAdd]   = useState("");
+  const [adding, setAdding]       = useState(false);
   const [newTaskModal, setNewTaskModal] = useState(false);
 
   const allTasksFlat = useMemo(
     () => [...tasks, ...tasks.flatMap((t) => t.subtasks)],
     [tasks]
   );
-  const totalCount = allTasksFlat.length;
+  const totalCount     = allTasksFlat.length;
   const completedCount = allTasksFlat.filter((t) => t.completed).length;
-  const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const progressPct    = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const overdueCount = tasks.filter(
     (t) => !t.completed && t.dueDate && new Date(t.dueDate) < (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })()
@@ -38,15 +54,14 @@ export function TodoView({ tasks }: Props) {
   const todayCount = tasks.filter((t) => {
     if (!t.dueDate) return false;
     const today = new Date(); today.setHours(0,0,0,0);
-    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
     const d = new Date(t.dueDate);
     return d >= today && d < tomorrow;
   }).length;
 
-  const visible = useMemo(
-    () => sortTasks(filterTasks(tasks, filter)),
-    [tasks, filter]
-  );
+  const filtered = useMemo(() => filterTasks(tasks, filter), [tasks, filter]);
+  const sorted   = useMemo(() => sortTasks(filtered, sort),  [filtered, sort]);
+  const grouped  = useMemo(() => sort === "category" ? groupByCategory(sorted) : null, [sort, sorted]);
 
   async function handleQuickAdd(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter" || !quickAdd.trim()) return;
@@ -56,6 +71,12 @@ export function TodoView({ tasks }: Props) {
     router.refresh();
     setAdding(false);
   }
+
+  const emptyMessage =
+    filter === "today"     ? "Nothing due today" :
+    filter === "overdue"   ? "You're all caught up" :
+    filter === "completed" ? "No completed tasks yet" :
+                             "No open tasks — add one above";
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -107,42 +128,77 @@ export function TodoView({ tasks }: Props) {
         />
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-1 mb-5 bg-surface-raised border border-surface-border rounded-xl p-1">
-        {FILTERS.map((f) => {
-          const badge = f.value === "overdue" ? overdueCount : f.value === "today" ? todayCount : null;
-          return (
+      {/* Filter + Sort row */}
+      <div className="flex items-center gap-3 mb-5">
+        {/* Filter tabs */}
+        <div className="flex flex-1 gap-1 bg-surface-raised border border-surface-border rounded-xl p-1">
+          {FILTERS.map((f) => {
+            const badge = f.value === "overdue" ? overdueCount : f.value === "today" ? todayCount : null;
+            return (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5
+                  ${filter === f.value ? "bg-accent/20 text-accent" : "text-fg-2 hover:text-fg"}`}
+              >
+                {f.label}
+                {badge != null && badge > 0 && (
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold
+                    ${f.value === "overdue" ? "bg-red-500/20 text-red-400" : "bg-accent/20 text-accent"}`}>
+                    {badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sort selector */}
+        <div className="flex gap-1 bg-surface-raised border border-surface-border rounded-xl p-1 flex-shrink-0">
+          {SORTS.map((s) => (
             <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1.5
-                ${filter === f.value ? "bg-accent/20 text-accent" : "text-fg-2 hover:text-fg"}`}
+              key={s.value}
+              onClick={() => setSort(s.value)}
+              title={`Sort by ${s.label}`}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1
+                ${sort === s.value ? "bg-accent/20 text-accent" : "text-fg-3 hover:text-fg-2"}`}
             >
-              {f.label}
-              {badge != null && badge > 0 && (
-                <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold
-                  ${f.value === "overdue" ? "bg-red-500/20 text-red-400" : "bg-accent/20 text-accent"}`}>
-                  {badge}
-                </span>
-              )}
+              <span>{s.icon}</span>
+              <span className="hidden sm:inline">{s.label}</span>
             </button>
-          );
-        })}
+          ))}
+        </div>
       </div>
 
       {/* Task list */}
-      <div className="space-y-2">
-        {visible.length === 0 ? (
-          <div className="text-center py-16 text-fg-3 text-sm">
-            {filter === "all" && "No open tasks — add one above"}
-            {filter === "today" && "Nothing due today"}
-            {filter === "overdue" && "You're all caught up"}
-            {filter === "completed" && "No completed tasks yet"}
-          </div>
-        ) : (
-          visible.map((task) => <TaskItem key={task.id} task={task} />)
-        )}
-      </div>
+      {sorted.length === 0 ? (
+        <div className="text-center py-16 text-fg-3 text-sm">{emptyMessage}</div>
+      ) : grouped ? (
+        // Category-grouped view
+        <div className="space-y-6">
+          {grouped.map(({ category, tasks: catTasks }) => {
+            const meta = TODO_CATEGORIES[category as TodoCategoryKey];
+            return (
+              <div key={category}>
+                <div className={`flex items-center gap-2 mb-2 px-1`}>
+                  <span className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${meta?.bg ?? "bg-surface-raised"} ${meta?.text ?? "text-fg-2"} ${meta?.border ?? "border-surface-border"}`}>
+                    {meta?.label ?? category}
+                  </span>
+                  <span className="text-xs text-fg-3">{catTasks.length} task{catTasks.length !== 1 ? "s" : ""}</span>
+                </div>
+                <div className="space-y-2">
+                  {catTasks.map((task) => <TaskItem key={task.id} task={task} />)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        // Flat list (priority or due-date sort)
+        <div className="space-y-2">
+          {sorted.map((task) => <TaskItem key={task.id} task={task} />)}
+        </div>
+      )}
 
       {newTaskModal && (
         <TaskModal onClose={() => setNewTaskModal(false)} />

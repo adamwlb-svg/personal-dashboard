@@ -40,6 +40,7 @@ export type SerializedTask = Subtask & {
 };
 
 export type Filter = "all" | "today" | "overdue" | "completed";
+export type Sort = "priority" | "due-date" | "category";
 
 export function filterTasks(tasks: SerializedTask[], filter: Filter): SerializedTask[] {
   const todayStart = new Date();
@@ -65,9 +66,37 @@ export function filterTasks(tasks: SerializedTask[], filter: Filter): Serialized
   }
 }
 
-export function sortTasks(tasks: SerializedTask[]): SerializedTask[] {
+export function sortTasks(tasks: SerializedTask[], sort: Sort = "priority"): SerializedTask[] {
   return [...tasks].sort((a, b) => {
+    // Completed tasks always sink to the bottom
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
+
+    if (sort === "due-date") {
+      // Due date first (nulls last), then priority
+      if (a.dueDate && b.dueDate)
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      const pa = PRIORITY_ORDER[a.priority] ?? 1;
+      const pb = PRIORITY_ORDER[b.priority] ?? 1;
+      return pa - pb;
+    }
+
+    if (sort === "category") {
+      // Category name alphabetically, then priority within category
+      const ca = a.category.localeCompare(b.category);
+      if (ca !== 0) return ca;
+      const pa = PRIORITY_ORDER[a.priority] ?? 1;
+      const pb = PRIORITY_ORDER[b.priority] ?? 1;
+      if (pa !== pb) return pa - pb;
+      if (a.dueDate && b.dueDate)
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      if (a.dueDate) return -1;
+      if (b.dueDate) return 1;
+      return 0;
+    }
+
+    // Default: priority → due date
     const pa = PRIORITY_ORDER[a.priority] ?? 1;
     const pb = PRIORITY_ORDER[b.priority] ?? 1;
     if (pa !== pb) return pa - pb;
@@ -77,6 +106,18 @@ export function sortTasks(tasks: SerializedTask[]): SerializedTask[] {
     if (b.dueDate) return 1;
     return 0;
   });
+}
+
+// Returns tasks grouped by category, preserving sort within each group
+export function groupByCategory(tasks: SerializedTask[]): { category: string; tasks: SerializedTask[] }[] {
+  const map = new Map<string, SerializedTask[]>();
+  for (const t of tasks) {
+    if (!map.has(t.category)) map.set(t.category, []);
+    map.get(t.category)!.push(t);
+  }
+  return Array.from(map.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([category, tasks]) => ({ category, tasks }));
 }
 
 export function isOverdue(dueDate: string | null): boolean {
