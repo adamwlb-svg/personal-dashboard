@@ -50,3 +50,58 @@ export async function deleteSupplement(id: number) {
   await prisma.supplementEntry.delete({ where: { id } });
   revalidatePath("/health");
 }
+
+// ── Daily supplement stack ────────────────────────────────────────────────────
+
+export async function createDailySupplement(data: { name: string; amount: number; unit: string }) {
+  const count = await prisma.dailySupplement.count();
+  await prisma.dailySupplement.create({
+    data: { name: data.name, amount: data.amount, unit: data.unit, sortOrder: count },
+  });
+  revalidatePath("/health");
+}
+
+export async function updateDailySupplement(id: number, data: { name: string; amount: number; unit: string; isActive: boolean }) {
+  await prisma.dailySupplement.update({ where: { id }, data });
+  revalidatePath("/health");
+}
+
+export async function deleteDailySupplement(id: number) {
+  await prisma.dailySupplement.delete({ where: { id } });
+  revalidatePath("/health");
+}
+
+export async function logDailyStack(
+  supplements: Array<{ name: string; amount: number; unit: string }>
+) {
+  for (const s of supplements) {
+    await prisma.supplementEntry.create({
+      data: { name: s.name, amount: s.amount, unit: s.unit },
+    });
+  }
+  revalidatePath("/health");
+}
+
+// ── Workout entries ───────────────────────────────────────────────────────────
+
+export async function logWorkout(data: {
+  activity: string;
+  minutes: number;
+  notes?: string;
+  loggedAt?: string;
+}) {
+  await prisma.workoutEntry.create({
+    data: {
+      activity: data.activity,
+      minutes: data.minutes,
+      notes: data.notes || null,
+      loggedAt: data.loggedAt ? new Date(data.loggedAt) : new Date(),
+    },
+  });
+  revalidatePath("/health");
+}
+
+export async function deleteWorkout(id: number) {
+  await prisma.workoutEntry.delete({ where: { id } });
+  revalidatePath("/health");
+}

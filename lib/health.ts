@@ -1,7 +1,6 @@
 export const METRIC_TYPES = {
   weight:   { label: "Weight",   unit: "lbs", icon: "⚖️", color: "text-blue-400",    bg: "bg-blue-500/10",    border: "border-blue-500/20" },
   sleep:    { label: "Sleep",    unit: "hrs", icon: "🌙", color: "text-violet-400",  bg: "bg-violet-500/10",  border: "border-violet-500/20" },
-  exercise: { label: "Exercise", unit: "min", icon: "🏃", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
   calories: { label: "Calories", unit: "cal", icon: "🔥", color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20" },
 } as const;
 
@@ -33,6 +32,47 @@ export type SerializedSupplementEntry = {
   notes: string | null;
   loggedAt: string;
 };
+
+export type SerializedDailySupplement = {
+  id: number;
+  name: string;
+  amount: number;
+  unit: string;
+  isActive: boolean;
+  sortOrder: number;
+};
+
+export type SerializedWorkout = {
+  id: number;
+  activity: string;
+  minutes: number;
+  notes: string | null;
+  loggedAt: string;
+};
+
+export const COMMON_ACTIVITIES = [
+  "Run", "Walk", "Cycle", "Swim", "Gym", "Yoga",
+  "Pilates", "HIIT", "Tennis", "Basketball", "Hike", "Stretch",
+];
+
+// Returns the Monday of the week containing `date`
+export function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function getWeekWorkouts(workouts: SerializedWorkout[], weekStart: Date): SerializedWorkout[] {
+  const end = new Date(weekStart);
+  end.setDate(end.getDate() + 7);
+  return workouts.filter((w) => {
+    const d = new Date(w.loggedAt);
+    return d >= weekStart && d < end;
+  });
+}
 
 export type SerializedChatMessage = {
   id: number;

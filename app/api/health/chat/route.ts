@@ -5,20 +5,35 @@ import { METRIC_TYPES, MetricType } from "@/lib/health";
 const LOG_METRIC_TOOL = {
   name: "log_metric",
   description:
-    "Log a health metric (weight, sleep duration, exercise duration, or calorie intake) to the database. Use this whenever the user mentions tracking or logging a specific value for one of these metrics.",
+    "Log a health metric (weight, sleep duration, or calorie intake) to the database. Use this whenever the user mentions tracking or logging a specific value for one of these metrics. For exercise/workouts, use log_workout instead.",
   input_schema: {
     type: "object" as const,
     properties: {
       type: {
         type: "string",
-        enum: ["weight", "sleep", "exercise", "calories"],
+        enum: ["weight", "sleep", "calories"],
         description: "The metric type to log",
       },
       value: { type: "number", description: "The numeric value to log" },
-      unit: { type: "string", description: "Unit override (optional — defaults are lbs, hrs, min, cal)" },
+      unit: { type: "string", description: "Unit override (optional — defaults are lbs, hrs, cal)" },
       notes: { type: "string", description: "Optional notes about this entry" },
     },
     required: ["type", "value"],
+  },
+};
+
+const LOG_WORKOUT_TOOL = {
+  name: "log_workout",
+  description:
+    "Log an exercise or workout session. Use this when the user mentions any physical activity — running, gym, yoga, cycling, sports, etc.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      activity: { type: "string", description: "Activity name, e.g. 'Run', 'Gym', 'Yoga', 'Cycle'" },
+      minutes: { type: "number", description: "Duration in minutes" },
+      notes: { type: "string", description: "Optional notes, e.g. distance, intensity" },
+    },
+    required: ["activity", "minutes"],
   },
 };
 
@@ -108,7 +123,7 @@ ${metricsContext}
 
 ${supplementsContext}`;
 
-  const tools = [LOG_METRIC_TOOL, LOG_SUPPLEMENT_TOOL];
+  const tools = [LOG_METRIC_TOOL, LOG_WORKOUT_TOOL, LOG_SUPPLEMENT_TOOL];
 
   // First Claude call
   const response1 = await client.messages.create({
@@ -131,7 +146,14 @@ ${supplementsContext}`;
 
       let resultText = "";
 
-      if (block.name === "log_metric") {
+      if (block.name === "log_workout") {
+        const input = block.input as { activity: string; minutes: number; notes?: string };
+        await prisma.workoutEntry.create({
+          data: { activity: input.activity, minutes: Math.round(input.minutes), notes: input.notes ?? null },
+        }).catch(() => null);
+        logged = true;
+        resultText = `Logged workout: ${input.activity} ${input.minutes} min`;
+      } else if (block.name === "log_metric") {
         const input = block.input as { type: string; value: number; unit?: string; notes?: string };
         const metricMeta = METRIC_TYPES[input.type as MetricType];
         const unit = input.unit ?? metricMeta?.unit ?? "unit";
@@ -157,7 +179,6 @@ ${supplementsContext}`;
       toolResults.push({ type: "tool_result", tool_use_id: block.id, content: resultText });
     }
 
-    // Second call with tool results
     const response2 = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,

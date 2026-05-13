@@ -3,16 +3,21 @@
 import {
   SerializedMetric,
   SerializedSupplementEntry,
+  SerializedDailySupplement,
+  SerializedWorkout,
   SerializedChatMessage,
   SerializedAppointment,
   MetricType,
   getTodayTotal,
   getTodaySupplements,
+  getWeekStart,
+  getWeekWorkouts,
 } from "@/lib/health";
 import { SerializedFinanceTodo } from "@/lib/finance";
 import { AppointmentsCard } from "./AppointmentsCard";
 import { MetricCard } from "./MetricCard";
 import { SupplementTracker } from "./SupplementTracker";
+import { ExerciseLog } from "./ExerciseLog";
 import { HealthTodos } from "./HealthTodos";
 import { HealthChat } from "./HealthChat";
 
@@ -20,17 +25,23 @@ type Props = {
   appointments: SerializedAppointment[];
   metrics: SerializedMetric[];
   supplements: SerializedSupplementEntry[];
+  dailyStack: SerializedDailySupplement[];
+  workouts: SerializedWorkout[];
   todos: SerializedFinanceTodo[];
   chatMessages: SerializedChatMessage[];
   aiConfigured: boolean;
 };
 
-const METRIC_ORDER: MetricType[] = ["weight", "sleep", "exercise", "calories"];
+// weight, sleep, calories only — exercise is its own weekly log
+const METRIC_ORDER: MetricType[] = ["weight", "sleep", "calories"];
 
-export function HealthView({ appointments, metrics, supplements, todos, chatMessages, aiConfigured }: Props) {
-  const todayExercise = getTodayTotal(metrics, "exercise");
+export function HealthView({
+  appointments, metrics, supplements, dailyStack, workouts, todos, chatMessages, aiConfigured,
+}: Props) {
   const todayCalories = getTodayTotal(metrics, "calories");
   const todaySupplements = getTodaySupplements(supplements);
+  const weekWorkouts = getWeekWorkouts(workouts, getWeekStart(new Date()));
+  const weekMinutes = weekWorkouts.reduce((s, w) => s + w.minutes, 0);
 
   return (
     <div className="space-y-6">
@@ -44,19 +55,19 @@ export function HealthView({ appointments, metrics, supplements, todos, chatMess
         <AppointmentsCard appointments={appointments} />
 
         <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-4">📊 Today&apos;s Summary</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">📊 Snapshot</h3>
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              { label: "Exercise",    value: todayExercise,           unit: "min",   color: "text-emerald-400" },
-              { label: "Calories",    value: todayCalories,           unit: "cal",   color: "text-orange-400" },
-              { label: "Supplements", value: todaySupplements.length, unit: "taken", color: "text-pink-400" },
+              { label: "Exercise",    value: weekMinutes > 0 ? weekMinutes : null,           unit: "min/wk",  color: "text-emerald-400" },
+              { label: "Calories",    value: todayCalories > 0 ? todayCalories : null,       unit: "today",   color: "text-orange-400" },
+              { label: "Supplements", value: todaySupplements.length > 0 ? todaySupplements.length : null, unit: "today", color: "text-pink-400" },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <p className={`text-xl font-semibold ${item.color}`}>
-                  {item.value > 0 ? item.value : "—"}
+                  {item.value ?? "—"}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">{item.label}</p>
-                {item.value > 0 && <p className="text-xs text-gray-600">{item.unit}</p>}
+                {item.value && <p className="text-xs text-gray-600">{item.unit}</p>}
               </div>
             ))}
           </div>
@@ -72,21 +83,24 @@ export function HealthView({ appointments, metrics, supplements, todos, chatMess
         </div>
       </div>
 
-      {/* Metrics grid */}
+      {/* Metrics (weight, sleep, calories) */}
       <div>
         <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Metrics</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {METRIC_ORDER.map((type) => (
             <MetricCard key={type} type={type} metrics={metrics} />
           ))}
         </div>
       </div>
 
-      {/* Supplements + To-Dos */}
+      {/* Exercise (weekly) + Supplements (daily stack) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <SupplementTracker supplements={supplements} />
-        <HealthTodos todos={todos} />
+        <ExerciseLog workouts={workouts} />
+        <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
       </div>
+
+      {/* Health To-Dos */}
+      <HealthTodos todos={todos} />
 
       {/* Wearable sync placeholder */}
       <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
@@ -103,10 +117,10 @@ export function HealthView({ appointments, metrics, supplements, todos, chatMess
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: "👣", label: "Steps",       sub: "Daily step count" },
-            { icon: "❤️", label: "Heart Rate",  sub: "Resting + zones" },
+            { icon: "👣", label: "Steps",        sub: "Daily step count" },
+            { icon: "❤️", label: "Heart Rate",   sub: "Resting + zones" },
             { icon: "🌙", label: "Sleep Stages", sub: "Deep, REM, light" },
-            { icon: "🏋️", label: "Workouts",    sub: "Auto-detected" },
+            { icon: "🏋️", label: "Workouts",     sub: "Auto-detected" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-2 opacity-40">
               <span className="text-base">{item.icon}</span>
@@ -125,7 +139,8 @@ export function HealthView({ appointments, metrics, supplements, todos, chatMess
           <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">AI Assistant</h2>
           {aiConfigured && (
             <p className="text-xs text-gray-600">
-              Say <span className="text-gray-400">&ldquo;I slept 8hrs&rdquo;</span>,{" "}
+              Say{" "}
+              <span className="text-gray-400">&ldquo;I slept 8hrs&rdquo;</span>,{" "}
               <span className="text-gray-400">&ldquo;ran 30 min&rdquo;</span>, or{" "}
               <span className="text-gray-400">&ldquo;took Vitamin D 2000mg&rdquo;</span> to log automatically
             </p>
