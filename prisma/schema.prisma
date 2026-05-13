@@ -10,6 +10,7 @@ datasource db {
 model Task {
   id          Int       @id @default(autoincrement())
   title       String
+  emoji       String?
   notes       String?
   completed   Boolean   @default(false)
   completedAt DateTime?
@@ -31,6 +32,7 @@ model Task {
 model Event {
   id            Int       @id @default(autoincrement())
   title         String
+  emoji         String?
   description   String?
   location      String?
   startTime     DateTime

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 type TaskInput = {
   title: string;
+  emoji?: string;
   notes?: string;
   dueDate?: string;
   priority: string;
@@ -41,6 +42,7 @@ export async function createTask(data: TaskInput) {
   await prisma.task.create({
     data: {
       title: data.title,
+      emoji: data.emoji || null,
       notes: data.notes || null,
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       priority: data.priority,
@@ -93,6 +95,7 @@ export async function updateTask(id: number, data: TaskInput) {
     where: { id },
     data: {
       title: data.title,
+      emoji: data.emoji || null,
       notes: data.notes || null,
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       priority: data.priority,

@@ -10,6 +10,7 @@ export type TodoDue = {
 export type CalendarEvent = {
   id: number;
   title: string;
+  emoji: string | null;
   description: string | null;
   location: string | null;
   startTime: Date;

@@ -234,6 +234,7 @@ export function WeekView({
                   >
                     <p className="text-xs font-medium truncate leading-tight">
                       {event.isRecurring && <span className="opacity-50 mr-0.5">↻</span>}
+                      {event.emoji && <span className="mr-0.5">{event.emoji}</span>}
                       {event.title}
                     </p>
                     {height > 30 && (

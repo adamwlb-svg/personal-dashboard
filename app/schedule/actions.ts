@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 type EventInput = {
   title: string;
+  emoji?: string;
   description?: string;
   location?: string;
   startTime: string;
@@ -20,6 +21,7 @@ export async function createEvent(data: EventInput) {
   await prisma.event.create({
     data: {
       title: data.title,
+      emoji: data.emoji || null,
       description: data.description || null,
       location: data.location || null,
       startTime: new Date(data.startTime),
@@ -39,6 +41,7 @@ export async function updateEvent(id: number, data: EventInput) {
     where: { id },
     data: {
       title: data.title,
+      emoji: data.emoji || null,
       description: data.description || null,
       location: data.location || null,
       startTime: new Date(data.startTime),

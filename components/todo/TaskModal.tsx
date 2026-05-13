@@ -10,6 +10,7 @@ import {
   Subtask,
 } from "@/lib/todo";
 import { createTask, updateTask, deleteTask } from "@/app/todo/actions";
+import { EmojiPicker } from "@/components/ui/EmojiPicker";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -29,6 +30,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
   const isEditing = !!task;
 
   const [title, setTitle] = useState(task?.title ?? "");
+  const [emoji, setEmoji] = useState(task?.emoji ?? "");
   const [notes, setNotes] = useState(task?.notes ?? "");
   const [dueDate, setDueDate] = useState(toDateInput(task?.dueDate ?? null));
   const [priority, setPriority] = useState<PriorityKey>(
@@ -52,6 +54,7 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
 
     const data = {
       title: title.trim(),
+      emoji: emoji || undefined,
       notes: notes.trim() || undefined,
       dueDate: dueDate || undefined,
       priority,
@@ -103,16 +106,19 @@ export function TaskModal({ task, parentId, defaultCategory, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {/* Title */}
-          <input
-            type="text"
-            placeholder="Task title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            autoFocus
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
-          />
+          {/* Title + Emoji */}
+          <div className="flex gap-2">
+            <EmojiPicker value={emoji} onChange={setEmoji} />
+            <input
+              type="text"
+              placeholder="Task title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+              className="flex-1 bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
+            />
+          </div>
 
           {/* Notes */}
           <textarea

@@ -49,6 +49,7 @@ function SubtaskRow({ subtask, onEdit }: { subtask: Subtask; onEdit: () => void 
       <span
         className={`text-sm flex-1 ${subtask.completed ? "line-through text-fg-3" : "text-fg-2"}`}
       >
+        {subtask.emoji && <span className="mr-1">{subtask.emoji}</span>}
         {subtask.title}
       </span>
       {subtask.dueDate && (
@@ -109,6 +110,11 @@ export function TaskItem({ task }: Props) {
 
           {/* Priority dot */}
           <div className={`w-2 h-2 rounded-full flex-shrink-0 ${pri.dot}`} />
+
+          {/* Emoji */}
+          {task.emoji && (
+            <span className="text-base flex-shrink-0">{task.emoji}</span>
+          )}
 
           {/* Title + meta */}
           <div className="flex-1 min-w-0">

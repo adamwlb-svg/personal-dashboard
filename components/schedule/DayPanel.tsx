@@ -107,6 +107,7 @@ export function DayPanel({
                 >
                   <p className={`text-sm font-medium ${cat.text}`}>
                     {event.isRecurring && <span className="opacity-50 mr-1">↻</span>}
+                    {event.emoji && <span className="mr-1">{event.emoji}</span>}
                     {event.title}
                   </p>
                   {event.allDay ? (

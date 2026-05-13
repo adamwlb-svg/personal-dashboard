@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarEvent, CATEGORIES, CategoryKey } from "@/lib/calendar";
 import { createEvent, updateEvent, deleteEvent } from "@/app/schedule/actions";
+import { EmojiPicker } from "@/components/ui/EmojiPicker";
 import { useRouter } from "next/navigation";
 
 type Props = {
@@ -53,6 +54,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
     event?.endTime ?? new Date(initStart.getTime() + 60 * 60 * 1000);
 
   const [title, setTitle] = useState(event?.title ?? "");
+  const [emoji, setEmoji] = useState(event?.emoji ?? "");
   const [description, setDescription] = useState(event?.description ?? "");
   const [location, setLocation] = useState(event?.location ?? "");
   const [category, setCategory] = useState<CategoryKey>(
@@ -126,6 +128,7 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
     const rrule = buildRRule();
     const data = {
       title: title.trim(),
+      emoji: emoji || undefined,
       description: description.trim() || undefined,
       location: location.trim() || undefined,
       startTime: new Date(startTime).toISOString(),
@@ -197,16 +200,19 @@ export function EventModal({ event, defaultDate, onClose }: Props) {
           onSubmit={handleSubmit}
           className="p-5 space-y-4 max-h-[80vh] overflow-y-auto"
         >
-          {/* Title */}
-          <input
-            type="text"
-            placeholder="Event title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            autoFocus
-            className="w-full bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
-          />
+          {/* Title + Emoji */}
+          <div className="flex gap-2">
+            <EmojiPicker value={emoji} onChange={setEmoji} />
+            <input
+              type="text"
+              placeholder="Event title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              autoFocus
+              className="flex-1 bg-surface border border-surface-border rounded-lg px-4 py-2.5 text-fg placeholder-gray-500 focus:outline-none focus:border-accent"
+            />
+          </div>
 
           {/* All day */}
           <label className="flex items-center gap-3 cursor-pointer select-none">

@@ -23,6 +23,7 @@ export const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low:
 export type Subtask = {
   id: number;
   title: string;
+  emoji: string | null;
   notes: string | null;
   completed: boolean;
   completedAt: string | null;

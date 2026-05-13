@@ -159,6 +159,7 @@ export function MonthGrid({
                       ${isDragging ? "opacity-40 scale-95" : "hover:opacity-75"}`}
                   >
                     {event.isRecurring && <span className="opacity-50 mr-0.5">↻</span>}
+                    {event.emoji && <span className="mr-0.5">{event.emoji}</span>}
                     {!event.allDay && <span className="opacity-60">{format(event.startTime, "h:mma")} </span>}
                     {event.title}
                   </button>
