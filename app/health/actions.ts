@@ -82,6 +82,27 @@ export async function logDailyStack(
   revalidatePath("/health");
 }
 
+// Called server-side on page load — auto-logs the active daily stack once per day.
+// Tracks completion in DailyStackAutoLog so deleted entries aren't re-created on refresh.
+export async function ensureDailyStackLogged(): Promise<void> {
+  const today = new Date().toISOString().substring(0, 10);
+  try {
+    const alreadyDone = await prisma.dailyStackAutoLog.findUnique({ where: { date: today } });
+    if (alreadyDone) return;
+
+    const activeStack = await prisma.dailySupplement.findMany({ where: { isActive: true } });
+    if (activeStack.length > 0) {
+      await prisma.supplementEntry.createMany({
+        data: activeStack.map((s) => ({ name: s.name, amount: s.amount, unit: s.unit })),
+      });
+    }
+
+    await prisma.dailyStackAutoLog.create({ data: { date: today } });
+  } catch {
+    // Table may not exist yet on first deploy — silently skip
+  }
+}
+
 // ── Workout entries ───────────────────────────────────────────────────────────
 
 export async function logWorkout(data: {

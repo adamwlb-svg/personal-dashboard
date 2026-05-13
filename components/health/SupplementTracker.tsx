@@ -12,7 +12,6 @@ import {
 import {
   logSupplement,
   deleteSupplement,
-  logDailyStack,
   createDailySupplement,
   updateDailySupplement,
   deleteDailySupplement,
@@ -27,20 +26,6 @@ export function SupplementTracker({ supplements, dailyStack }: Props) {
   const router = useRouter();
   const todayEntries = getTodaySupplements(supplements);
   const [tab, setTab] = useState<"today" | "stack">("today");
-  const [loggingAll, setLoggingAll] = useState(false);
-
-  // Which daily stack items haven't been logged today yet
-  const unlogged = dailyStack.filter(
-    (s) => s.isActive && !todayEntries.some((e) => e.name.toLowerCase() === s.name.toLowerCase())
-  );
-
-  async function handleLogAll() {
-    if (unlogged.length === 0) return;
-    setLoggingAll(true);
-    await logDailyStack(unlogged.map((s) => ({ name: s.name, amount: s.amount, unit: s.unit })));
-    setLoggingAll(false);
-    router.refresh();
-  }
 
   async function handleLogOne(s: SerializedDailySupplement) {
     await logSupplement({ name: s.name, amount: s.amount, unit: s.unit });
@@ -78,9 +63,6 @@ export function SupplementTracker({ supplements, dailyStack }: Props) {
           <TodayTab
             todayEntries={todayEntries}
             dailyStack={dailyStack}
-            unlogged={unlogged}
-            loggingAll={loggingAll}
-            onLogAll={handleLogAll}
             onLogOne={handleLogOne}
             onUnlog={handleUnlog}
             supplements={supplements}
@@ -98,18 +80,12 @@ export function SupplementTracker({ supplements, dailyStack }: Props) {
 function TodayTab({
   todayEntries,
   dailyStack,
-  unlogged,
-  loggingAll,
-  onLogAll,
   onLogOne,
   onUnlog,
   supplements,
 }: {
   todayEntries: SerializedSupplementEntry[];
   dailyStack: SerializedDailySupplement[];
-  unlogged: SerializedDailySupplement[];
-  loggingAll: boolean;
-  onLogAll: () => void;
   onLogOne: (s: SerializedDailySupplement) => void;
   onUnlog: (id: number) => void;
   supplements: SerializedSupplementEntry[];
@@ -146,18 +122,7 @@ function TodayTab({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs text-fg-3">Daily stack</p>
-            {unlogged.length > 0 && (
-              <button
-                onClick={onLogAll}
-                disabled={loggingAll}
-                className="text-xs px-2 py-1 bg-pink-600 hover:bg-pink-500 text-fg rounded-lg transition-colors disabled:opacity-50"
-              >
-                {loggingAll ? "Logging…" : `Log all (${unlogged.length})`}
-              </button>
-            )}
-            {unlogged.length === 0 && (
-              <span className="text-xs text-emerald-400">✓ All logged</span>
-            )}
+            <span className="text-xs text-fg-3 italic">auto-logged · uncheck to skip</span>
           </div>
           <div className="space-y-1">
             {activeDailyStack.map((s) => {
@@ -194,7 +159,7 @@ function TodayTab({
 
       {activeDailyStack.length === 0 && todayEntries.length === 0 && (
         <p className="text-xs text-fg-3 text-center py-2">
-          Set up your Daily Stack to log supplements in one click.
+          Set up your Daily Stack — it will be logged automatically each day.
         </p>
       )}
 
@@ -300,7 +265,7 @@ function StackTab({ dailyStack }: { dailyStack: SerializedDailySupplement[] }) {
   return (
     <>
       <p className="text-xs text-fg-3 leading-relaxed">
-        Define your regular supplement routine. Each day, go to the Today tab and log them all with one tap.
+        Active supplements are automatically logged each day when you open Health. Uncheck anything on the Today tab if you skipped it.
       </p>
 
       {dailyStack.length === 0 && (

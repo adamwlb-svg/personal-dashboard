@@ -134,6 +134,13 @@ model DailySupplement {
   updatedAt DateTime @updatedAt
 }
 
+// Tracks which dates the daily stack has been auto-logged, so deletions survive a refresh
+model DailyStackAutoLog {
+  id        Int      @id @default(autoincrement())
+  date      String   @unique // "YYYY-MM-DD"
+  createdAt DateTime @default(now())
+}
+
 model WorkoutEntry {
   id       Int      @id @default(autoincrement())
   activity String

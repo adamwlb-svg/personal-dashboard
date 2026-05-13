@@ -6,10 +6,13 @@ import {
   SerializedWorkout,
 } from "@/lib/health";
 import { SerializedFinanceTodo } from "@/lib/finance";
+import { ensureDailyStackLogged } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function HealthPage() {
+  // Auto-log the daily stack once per day before rendering
+  await ensureDailyStackLogged();
   let appointments: Awaited<ReturnType<typeof prisma.event.findMany>> = [];
   let metrics: Awaited<ReturnType<typeof prisma.healthMetric.findMany>> = [];
   let chatMessages: Awaited<ReturnType<typeof prisma.healthChatMessage.findMany>> = [];
