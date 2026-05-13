@@ -69,9 +69,15 @@ export function getWeekWorkouts(workouts: SerializedWorkout[], weekStart: Date):
   const end = new Date(weekStart);
   end.setDate(end.getDate() + 7);
   return workouts.filter((w) => {
-    const d = new Date(w.loggedAt);
-    return d >= weekStart && d < end;
+    const local = localDate(w.loggedAt);
+    return local >= weekStart && local < end;
   });
+}
+
+// Parse an ISO date string as local midnight to avoid UTC offset shifting the day
+export function localDate(isoString: string): Date {
+  const [y, m, d] = isoString.substring(0, 10).split("-").map(Number);
+  return new Date(y, m - 1, d);
 }
 
 export type SerializedChatMessage = {

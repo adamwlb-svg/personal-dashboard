@@ -8,7 +8,6 @@ import {
   SerializedChatMessage,
   SerializedAppointment,
   MetricType,
-  getTodayTotal,
   getTodaySupplements,
   getWeekStart,
   getWeekWorkouts,
@@ -32,13 +31,12 @@ type Props = {
   aiConfigured: boolean;
 };
 
-// weight, sleep, calories only — exercise is its own weekly log
-const METRIC_ORDER: MetricType[] = ["weight", "sleep", "calories"];
+// Only weight remains — sleep and calories removed per user request
+const METRIC_ORDER: MetricType[] = ["weight"];
 
 export function HealthView({
   appointments, metrics, supplements, dailyStack, workouts, todos, chatMessages, aiConfigured,
 }: Props) {
-  const todayCalories = getTodayTotal(metrics, "calories");
   const todaySupplements = getTodaySupplements(supplements);
   const weekWorkouts = getWeekWorkouts(workouts, getWeekStart(new Date()));
   const weekMinutes = weekWorkouts.reduce((s, w) => s + w.minutes, 0);
@@ -50,24 +48,21 @@ export function HealthView({
         <p className="text-sm text-gray-400 mt-0.5">Track your wellbeing and appointments.</p>
       </div>
 
-      {/* Top row: Appointments + Today snapshot */}
+      {/* 1. Appointments + Snapshot */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <AppointmentsCard appointments={appointments} />
 
         <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
           <h3 className="text-sm font-semibold text-white mb-4">📊 Snapshot</h3>
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             {[
-              { label: "Exercise",    value: weekMinutes > 0 ? weekMinutes : null,           unit: "min/wk",  color: "text-emerald-400" },
-              { label: "Calories",    value: todayCalories > 0 ? todayCalories : null,       unit: "today",   color: "text-orange-400" },
-              { label: "Supplements", value: todaySupplements.length > 0 ? todaySupplements.length : null, unit: "today", color: "text-pink-400" },
+              { label: "Exercise",    value: weekMinutes > 0 ? `${weekMinutes} min` : null, sub: "this week",  color: "text-emerald-400" },
+              { label: "Supplements", value: todaySupplements.length > 0 ? `${todaySupplements.length}` : null, sub: "today", color: "text-pink-400" },
             ].map((item) => (
               <div key={item.label} className="text-center">
-                <p className={`text-xl font-semibold ${item.color}`}>
-                  {item.value ?? "—"}
-                </p>
+                <p className={`text-2xl font-semibold ${item.color}`}>{item.value ?? "—"}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{item.label}</p>
-                {item.value && <p className="text-xs text-gray-600">{item.unit}</p>}
+                {item.value && <p className="text-xs text-gray-600">{item.sub}</p>}
               </div>
             ))}
           </div>
@@ -83,26 +78,10 @@ export function HealthView({
         </div>
       </div>
 
-      {/* Metrics (weight, sleep, calories) */}
-      <div>
-        <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Metrics</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {METRIC_ORDER.map((type) => (
-            <MetricCard key={type} type={type} metrics={metrics} />
-          ))}
-        </div>
-      </div>
-
-      {/* Exercise (weekly) + Supplements (daily stack) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ExerciseLog workouts={workouts} />
-        <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
-      </div>
-
-      {/* Health To-Dos */}
+      {/* 2. Health To-Dos */}
       <HealthTodos todos={todos} />
 
-      {/* Wearable sync placeholder */}
+      {/* 3. Wearable Sync */}
       <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-white flex items-center gap-2">
@@ -133,15 +112,30 @@ export function HealthView({
         </div>
       </div>
 
-      {/* AI Assistant */}
+      {/* 4. Metrics — weight only */}
+      <div>
+        <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Metrics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {METRIC_ORDER.map((type) => (
+            <MetricCard key={type} type={type} metrics={metrics} />
+          ))}
+        </div>
+      </div>
+
+      {/* 5. Exercise (weekly) + Supplements */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ExerciseLog workouts={workouts} />
+        <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
+      </div>
+
+      {/* 6. AI Assistant */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">AI Assistant</h2>
           {aiConfigured && (
             <p className="text-xs text-gray-600">
               Say{" "}
-              <span className="text-gray-400">&ldquo;I slept 8hrs&rdquo;</span>,{" "}
-              <span className="text-gray-400">&ldquo;ran 30 min&rdquo;</span>, or{" "}
+              <span className="text-gray-400">&ldquo;ran 30 min&rdquo;</span> or{" "}
               <span className="text-gray-400">&ldquo;took Vitamin D 2000mg&rdquo;</span> to log automatically
             </p>
           )}

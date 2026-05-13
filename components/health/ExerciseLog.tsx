@@ -7,6 +7,7 @@ import {
   COMMON_ACTIVITIES,
   getWeekStart,
   getWeekWorkouts,
+  localDate,
 } from "@/lib/health";
 import { logWorkout, deleteWorkout } from "@/app/health/actions";
 
@@ -47,8 +48,7 @@ export function ExerciseLog({ workouts }: Props) {
   // Group workouts by day of week
   const byDay: Record<number, SerializedWorkout[]> = {};
   for (const w of weekWorkouts) {
-    const d = new Date(w.loggedAt);
-    // day: 0=Mon … 6=Sun (adjust from JS Sunday=0)
+    const d = localDate(w.loggedAt); // parse as local date to avoid UTC offset shifting the day
     const js = d.getDay();
     const dayIdx = js === 0 ? 6 : js - 1;
     if (!byDay[dayIdx]) byDay[dayIdx] = [];
