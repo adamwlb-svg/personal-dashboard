@@ -153,16 +153,19 @@ export function StockTicker() {
       <div className="flex min-h-[340px]">
 
         {/* ── Watchlist sidebar ──────────────────────────────── */}
-        <div className="w-32 flex-shrink-0 border-r border-surface-border flex flex-col bg-surface">
+        <div className="w-36 flex-shrink-0 border-r border-surface-border flex flex-col bg-surface">
           <p className="text-xs font-semibold text-fg-3 uppercase tracking-wider px-3 pt-3 pb-2">
             Watchlist
           </p>
 
           <div className="flex-1 overflow-y-auto">
+            {watchlist.length === 0 && (
+              <p className="text-xs text-fg-4 px-3 py-2">No symbols yet</p>
+            )}
             {watchlist.map((fav) => (
               <div
                 key={fav}
-                className={`flex items-center justify-between px-3 py-2 group cursor-pointer transition-colors
+                className={`flex items-center justify-between px-2 py-1.5 group cursor-pointer transition-colors
                   ${symbol === fav ? "bg-accent/10" : "hover:bg-white/5"}`}
                 onClick={() => selectSymbol(fav)}
               >
@@ -171,8 +174,8 @@ export function StockTicker() {
                 </span>
                 <button
                   onClick={(e) => { e.stopPropagation(); removeFromWatchlist(fav); }}
-                  className="opacity-0 group-hover:opacity-100 text-fg-4 hover:text-red-400 transition-all text-base leading-none"
-                  title="Remove"
+                  className="w-5 h-5 flex items-center justify-center rounded text-fg-4 hover:text-red-400 hover:bg-red-400/10 transition-all text-sm leading-none flex-shrink-0"
+                  title="Remove from watchlist"
                 >
                   ×
                 </button>
@@ -181,15 +184,31 @@ export function StockTicker() {
           </div>
 
           {/* Add to watchlist */}
-          <div className="p-2 border-t border-surface-border">
+          <div className="p-2 border-t border-surface-border space-y-1.5">
+            {/* Quick-add current symbol */}
+            {data && !data.error && isConfigured && !inWatchlist && (
+              <button
+                onClick={() => addToWatchlist(symbol)}
+                className="w-full flex items-center justify-center gap-1 px-2 py-1 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-medium rounded transition-colors"
+              >
+                <span>★</span>
+                <span className="truncate">Add {symbol}</span>
+              </button>
+            )}
             <form onSubmit={(e) => { e.preventDefault(); addToWatchlist(addInput); }} className="flex gap-1">
               <input
                 value={addInput}
                 onChange={(e) => setAddInput(e.target.value.toUpperCase())}
-                placeholder="+ Add"
+                placeholder="Ticker…"
                 maxLength={10}
-                className="w-full bg-surface-raised border border-surface-border rounded px-2 py-1 text-xs text-fg placeholder-fg-4 focus:outline-none focus:border-accent uppercase"
+                className="min-w-0 flex-1 bg-surface-raised border border-surface-border rounded px-2 py-1 text-xs text-fg placeholder-fg-4 focus:outline-none focus:border-accent uppercase"
               />
+              <button
+                type="submit"
+                className="px-2 py-1 bg-accent hover:bg-accent-hover text-fg text-xs font-medium rounded transition-colors flex-shrink-0"
+              >
+                +
+              </button>
             </form>
           </div>
         </div>
