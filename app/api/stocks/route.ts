@@ -57,7 +57,12 @@ export async function GET(req: NextRequest) {
     ]);
 
     if (!quoteRes.ok || !candleRes.ok) {
-      return NextResponse.json({ configured: true, error: "API error", symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
+      const quoteText = !quoteRes.ok ? await quoteRes.text() : "";
+      const candleText = !candleRes.ok ? await candleRes.text() : "";
+      const detail = !quoteRes.ok
+        ? `Quote ${quoteRes.status}: ${quoteText.slice(0, 120)}`
+        : `Candle ${candleRes.status}: ${candleText.slice(0, 120)}`;
+      return NextResponse.json({ configured: true, error: detail, symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
     }
 
     const quote = await quoteRes.json();
