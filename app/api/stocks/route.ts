@@ -16,27 +16,14 @@ export type StockData = {
   error?: string;
 };
 
-const RANGE_DAYS: Record<string, number> = {
-  "1W": 7,
-  "1M": 30,
-  "6M": 182,
-  "1Y": 365,
-};
-
-// Candle resolution by range
-const RANGE_RESOLUTION: Record<string, string> = {
-  "1W": "30",  // 30-minute bars
-  "1M": "D",
-  "6M": "D",
-  "1Y": "W",
+const RANGE_PARAMS: Record<string, { range: string; interval: string }> = {
+  "1W": { range: "5d",  interval: "30m" },
+  "1M": { range: "1mo", interval: "1d"  },
+  "6M": { range: "6mo", interval: "1d"  },
+  "1Y": { range: "1y",  interval: "1wk" },
 };
 
 export async function GET(req: NextRequest) {
-  const apiKey = process.env.FINNHUB_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ configured: false, symbol: "", price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
-  }
-
   const { searchParams } = new URL(req.url);
   const symbol = (searchParams.get("symbol") ?? "").toUpperCase().trim();
   const range = searchParams.get("range") ?? "1M";
@@ -45,59 +32,68 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No symbol provided" }, { status: 400 });
   }
 
-  const now = Math.floor(Date.now() / 1000);
-  const days = RANGE_DAYS[range] ?? 30;
-  const from = now - days * 86400;
-  const resolution = RANGE_RESOLUTION[range] ?? "D";
+  const { range: r, interval } = RANGE_PARAMS[range] ?? RANGE_PARAMS["1M"];
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${r}`;
 
   try {
-    const [quoteRes, candleRes] = await Promise.all([
-      fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`, { cache: "no-store" }),
-      fetch(`https://finnhub.io/api/v1/stock/candle?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${now}&token=${apiKey}`, { cache: "no-store" }),
-    ]);
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
 
-    if (!quoteRes.ok || !candleRes.ok) {
-      const quoteText = !quoteRes.ok ? await quoteRes.text() : "";
-      const candleText = !candleRes.ok ? await candleRes.text() : "";
-      const detail = !quoteRes.ok
-        ? `Quote ${quoteRes.status}: ${quoteText.slice(0, 120)}`
-        : `Candle ${candleRes.status}: ${candleText.slice(0, 120)}`;
-      return NextResponse.json({ configured: true, error: detail, symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
+    if (!res.ok) {
+      const text = await res.text();
+      return NextResponse.json({
+        configured: true,
+        error: `${res.status}: ${text.slice(0, 150)}`,
+        symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [],
+      });
     }
 
-    const quote = await quoteRes.json();
-    const candles = await candleRes.json();
+    const data = await res.json();
+    const result = data?.chart?.result?.[0];
 
-    // Finnhub returns c=0 for unknown symbols
-    if (!quote.c && quote.c !== 0) {
-      return NextResponse.json({ configured: true, error: "Symbol not found", symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
+    if (!result) {
+      const err = data?.chart?.error;
+      return NextResponse.json({
+        configured: true,
+        error: err ? `${err.code}: ${err.description}` : `"${symbol}" not found`,
+        symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [],
+      });
     }
-    if (quote.c === 0 && quote.pc === 0) {
-      return NextResponse.json({ configured: true, error: "Symbol not found", symbol, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, prevClose: 0, history: [] });
-    }
 
-    const history: { date: string; close: number }[] =
-      candles.s === "ok"
-        ? candles.t.map((t: number, i: number) => ({
-            date: new Date(t * 1000).toISOString().substring(0, 10),
-            close: candles.c[i],
-          }))
-        : [];
+    const meta = result.meta;
+    const timestamps: number[] = result.timestamp ?? [];
+    const closes: number[] = result.indicators?.quote?.[0]?.close ?? [];
 
-    const result: StockData = {
+    // Build history, deduplicating intraday bars to one point per day (last bar)
+    const byDate = new Map<string, number>();
+    timestamps.forEach((t, i) => {
+      if (closes[i] != null) {
+        byDate.set(new Date(t * 1000).toISOString().substring(0, 10), closes[i]);
+      }
+    });
+    const history = Array.from(byDate.entries()).map(([date, close]) => ({ date, close }));
+
+    const price = meta.regularMarketPrice ?? 0;
+    const prevClose = meta.chartPreviousClose ?? meta.previousClose ?? 0;
+    const change = price - prevClose;
+    const changePercent = prevClose ? (change / prevClose) * 100 : 0;
+
+    const stockData: StockData = {
       configured: true,
-      symbol,
-      price: quote.c,
-      change: quote.d ?? 0,
-      changePercent: quote.dp ?? 0,
-      high: quote.h ?? 0,
-      low: quote.l ?? 0,
-      open: quote.o ?? 0,
-      prevClose: quote.pc ?? 0,
+      symbol: meta.symbol ?? symbol,
+      price,
+      change,
+      changePercent,
+      high: meta.regularMarketDayHigh ?? 0,
+      low: meta.regularMarketDayLow ?? 0,
+      open: meta.regularMarketOpen ?? 0,
+      prevClose,
       history,
     };
 
-    return NextResponse.json(result);
+    return NextResponse.json(stockData);
   } catch (err) {
     return NextResponse.json({
       configured: true,

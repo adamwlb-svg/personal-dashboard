@@ -144,9 +144,8 @@ export function StockTicker() {
     saveWatchlist(watchlist.filter((s) => s !== sym));
   }
 
-  const isPositive   = (data?.change ?? 0) >= 0;
-  const inWatchlist  = watchlist.includes(symbol);
-  const isConfigured = data?.configured !== false;
+  const isPositive  = (data?.change ?? 0) >= 0;
+  const inWatchlist = watchlist.includes(symbol);
 
   return (
     <div className="bg-surface-raised border border-surface-border rounded-2xl overflow-hidden">
@@ -186,7 +185,7 @@ export function StockTicker() {
           {/* Add to watchlist */}
           <div className="p-2 border-t border-surface-border space-y-1.5">
             {/* Quick-add current symbol */}
-            {data && !data.error && isConfigured && !inWatchlist && (
+            {data && !data.error && !inWatchlist && (
               <button
                 onClick={() => addToWatchlist(symbol)}
                 className="w-full flex items-center justify-center gap-1 px-2 py-1 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-medium rounded transition-colors"
@@ -236,7 +235,7 @@ export function StockTicker() {
             </form>
 
             {/* Star / watchlist toggle */}
-            {data && !data.error && isConfigured && (
+            {data && !data.error && (
               <button
                 onClick={() => inWatchlist ? removeFromWatchlist(symbol) : addToWatchlist(symbol)}
                 title={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
@@ -263,28 +262,8 @@ export function StockTicker() {
             </div>
           </div>
 
-          {/* Not configured */}
-          {data && !isConfigured && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center py-4 gap-2">
-              <p className="text-fg font-medium">Finnhub API key not configured</p>
-              <p className="text-sm text-fg-3">
-                Add{" "}
-                <code className="text-accent bg-surface px-1.5 py-0.5 rounded">FINNHUB_API_KEY</code>{" "}
-                to your Vercel environment variables.
-              </p>
-              <a
-                href="https://finnhub.io"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-accent hover:underline"
-              >
-                Get a free API key at finnhub.io →
-              </a>
-            </div>
-          )}
-
           {/* Loading skeleton */}
-          {loading && isConfigured && (
+          {loading && (
             <div className="animate-pulse space-y-3 flex-1">
               <div className="h-9 bg-surface rounded-lg w-48" />
               <div className="h-4 bg-surface rounded w-32" />
@@ -305,7 +284,7 @@ export function StockTicker() {
           )}
 
           {/* Stock data */}
-          {!loading && data && isConfigured && !data.error && (
+          {!loading && data && !data.error && (
             <>
               {/* Price header */}
               <div className="flex items-start justify-between gap-4 flex-wrap">
