@@ -122,18 +122,6 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap justify-end">
-              <PlaidConnect connectedCount={plaidConnectedCount} />
-              <button
-                onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Add Manual
-              </button>
-            </div>
           </div>
           <NetWorthChart data={netWorthHistory} />
         </div>
@@ -198,19 +186,31 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
         </div>
 
         {/* ── Accounts ──────────────────────────────────────────── */}
+        <div>
+          {/* Section header with actions */}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold text-fg-3 uppercase tracking-wider">Accounts</h2>
+            <div className="flex items-center gap-2">
+              <PlaidConnect connectedCount={plaidConnectedCount} />
+              <button
+                onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Manual
+              </button>
+            </div>
+          </div>
+
         {accounts.length === 0 ? (
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-10 text-center">
             <p className="text-2xl mb-2">💳</p>
             <p className="text-sm font-medium text-fg-2">No accounts yet</p>
             <p className="text-xs text-fg-3 mt-1 mb-4">
-              Add your checking, savings, investments, and debts to track your net worth.
+              Connect your bank or add accounts manually to track your net worth.
             </p>
-            <button
-              onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-              className="px-4 py-2 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
-            >
-              Add your first account
-            </button>
           </div>
         ) : (
           <div className="space-y-5">
@@ -240,6 +240,7 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
             )}
           </div>
         )}
+        </div>
 
         {/* ── Stock Ticker ──────────────────────────────────────── */}
         <StockTicker />
