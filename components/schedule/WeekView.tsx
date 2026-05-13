@@ -77,9 +77,9 @@ export function WeekView({
 
       {/* Due-date strip */}
       {days.some((day) => todos.some((t) => isSameDay(t.dueDate, day))) && (
-        <div className="flex border-b border-surface-border flex-shrink-0 bg-amber-500/5">
+        <div className="flex border-b border-surface-border flex-shrink-0 bg-red-500/5">
           <div className="w-14 flex-shrink-0 flex items-center justify-end pr-2">
-            <span className="text-xs text-amber-400 font-bold">!</span>
+            <span className="text-xs text-red-400 font-bold">!</span>
           </div>
           {days.map((day) => {
             const dayTodos = todos.filter((t) => isSameDay(t.dueDate, day));
@@ -89,7 +89,7 @@ export function WeekView({
                   <a
                     key={todo.id}
                     href="/todo"
-                    className="text-xs px-1.5 py-0.5 rounded truncate font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors flex items-center gap-0.5"
+                    className="text-xs px-1.5 py-0.5 rounded truncate font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors flex items-center gap-0.5"
                   >
                     <span className="font-bold flex-shrink-0">!</span>
                     <span className="truncate">{todo.title}</span>

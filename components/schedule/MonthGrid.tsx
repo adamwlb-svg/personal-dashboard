@@ -116,7 +116,7 @@ export function MonthGrid({
                   key={`todo-${todo.id}`}
                   href="/todo"
                   onClick={(e) => e.stopPropagation()}
-                  className="w-full text-left text-xs px-1.5 py-0.5 rounded truncate font-medium transition-opacity hover:opacity-75 bg-amber-500/20 text-amber-400 flex items-center gap-0.5"
+                  className="w-full text-left text-xs px-1.5 py-0.5 rounded truncate font-medium transition-opacity hover:opacity-75 bg-red-500/20 text-red-400 flex items-center gap-0.5"
                 >
                   <span className="font-bold flex-shrink-0">!</span>
                   <span className="truncate">{todo.title}</span>

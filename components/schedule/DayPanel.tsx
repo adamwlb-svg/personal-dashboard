@@ -15,7 +15,7 @@ type Props = {
 const PRIORITY_LABEL: Record<string, string> = { high: "High", medium: "Med", low: "Low" };
 const PRIORITY_COLOR: Record<string, string> = {
   high: "bg-red-500/20 text-red-400",
-  medium: "bg-amber-500/20 text-amber-400",
+  medium: "bg-red-500/20 text-red-400",
   low: "bg-fg-4/20 text-fg-3",
 };
 
@@ -67,16 +67,16 @@ export function DayPanel({
         {/* Due to-dos */}
         {dayTodos.length > 0 && (
           <div className="space-y-1.5">
-            <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide flex items-center gap-1">
+            <p className="text-xs font-semibold text-red-400 uppercase tracking-wide flex items-center gap-1">
               <span>!</span> Due Today
             </p>
             {dayTodos.map((todo) => (
               <a
                 key={todo.id}
                 href="/todo"
-                className="flex items-center gap-2 p-2.5 rounded-lg border border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                className="flex items-center gap-2 p-2.5 rounded-lg border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 transition-colors"
               >
-                <span className="text-amber-400 font-bold text-sm flex-shrink-0">!</span>
+                <span className="text-red-400 font-bold text-sm flex-shrink-0">!</span>
                 <span className="text-sm text-fg flex-1 truncate">{todo.title}</span>
                 <span className={`text-xs px-1.5 py-0.5 rounded ${PRIORITY_COLOR[todo.priority] ?? PRIORITY_COLOR.medium}`}>
                   {PRIORITY_LABEL[todo.priority] ?? todo.priority}
