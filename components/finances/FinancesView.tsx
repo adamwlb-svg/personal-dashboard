@@ -22,6 +22,7 @@ import { AllocationBar } from "./AllocationBar";
 import { FinanceChat } from "./FinanceChat";
 import { FinanceTodos } from "./FinanceTodos";
 import { PlaidConnect } from "./PlaidConnect";
+import { StockTicker } from "./StockTicker";
 import { updateBalance } from "@/app/finances/actions";
 
 type Props = {
@@ -239,6 +240,9 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
             )}
           </div>
         )}
+
+        {/* ── Stock Ticker ──────────────────────────────────────── */}
+        <StockTicker />
 
         {/* ── Chat ──────────────────────────────────────────────── */}
         <FinanceChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
