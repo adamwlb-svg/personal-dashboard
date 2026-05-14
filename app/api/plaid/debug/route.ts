@@ -22,7 +22,8 @@ export async function GET() {
     const res = await plaidClient.linkTokenCreate({
       user: { client_user_id: "debug-user" },
       client_name: "Personal Dashboard",
-      products: [Products.Transactions],
+      products: [Products.Auth],
+      optional_products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: "en",
     });

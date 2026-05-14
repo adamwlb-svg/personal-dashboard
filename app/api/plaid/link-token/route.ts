@@ -11,7 +11,8 @@ export async function POST() {
     const response = await plaidClient.linkTokenCreate({
       user: { client_user_id: "personal-dashboard-user" },
       client_name: "Personal Dashboard",
-      products: [Products.Transactions],
+      products: [Products.Auth],
+      optional_products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: "en",
     });
