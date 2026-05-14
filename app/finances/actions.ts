@@ -110,7 +110,7 @@ const FREQ_RRULE: Record<string, string> = {
 
 type RecurringExpenseInput = {
   name: string;
-  amount: number;
+  amount: number | null;
   frequency: string;
   category: string;
   isAutoPay: boolean;

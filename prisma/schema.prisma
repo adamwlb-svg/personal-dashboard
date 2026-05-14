@@ -59,7 +59,7 @@ model Event {
 model RecurringExpense {
   id          Int       @id @default(autoincrement())
   name        String
-  amount      Float
+  amount      Float?
   frequency   String    // "weekly" | "monthly" | "quarterly" | "yearly"
   category    String    @default("other")
   isAutoPay   Boolean   @default(false)

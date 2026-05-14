@@ -11,7 +11,7 @@ import {
 export type SerializedRecurringExpense = {
   id: number;
   name: string;
-  amount: number;
+  amount: number | null;
   frequency: string;
   category: string;
   isAutoPay: boolean;
@@ -42,8 +42,9 @@ function getCat(value: string) {
   return CATEGORIES.find((c) => c.value === value) ?? CATEGORIES[CATEGORIES.length - 1];
 }
 
-// Monthly-equivalent cost for display
-function toMonthly(amount: number, frequency: string): number {
+// Monthly-equivalent cost for display (null = variable, excluded from totals)
+function toMonthly(amount: number | null, frequency: string): number {
+  if (amount === null) return 0;
   switch (frequency) {
     case "weekly":    return (amount * 52) / 12;
     case "quarterly": return amount / 3;
@@ -79,7 +80,7 @@ function ExpenseModal({
   const isEditing = !!expense;
 
   const [name, setName]           = useState(expense?.name ?? "");
-  const [amount, setAmount]       = useState(expense?.amount.toString() ?? "");
+  const [amount, setAmount]       = useState(expense?.amount != null ? expense.amount.toString() : "");
   const [frequency, setFrequency] = useState(expense?.frequency ?? "monthly");
   const [category, setCategory]   = useState(expense?.category ?? "other");
   const [isAutoPay, setIsAutoPay] = useState(expense?.isAutoPay ?? false);
@@ -92,11 +93,11 @@ function ExpenseModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !amount || !nextDueDate) return;
+    if (!name.trim() || !nextDueDate) return;
     setSaving(true);
     const data = {
       name: name.trim(),
-      amount: parseFloat(amount),
+      amount: amount.trim() ? parseFloat(amount) : null,
       frequency,
       category,
       isAutoPay,
@@ -153,17 +154,16 @@ function ExpenseModal({
           {/* Amount + Frequency */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-fg-3 mb-1 block">Amount</label>
+              <label className="text-xs text-fg-3 mb-1 block">Amount <span className="text-fg-4">(optional)</span></label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-3 text-sm">$</span>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="0.00"
+                  placeholder="Variable"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  required
                   className="w-full bg-surface border border-surface-border rounded-lg pl-7 pr-3 py-2 text-fg text-sm focus:outline-none focus:border-accent"
                 />
               </div>
@@ -260,7 +260,7 @@ function ExpenseModal({
             </button>
             <button
               type="submit"
-              disabled={saving || !name.trim() || !amount || !nextDueDate}
+              disabled={saving || !name.trim() || !nextDueDate}
               className="px-5 py-2 rounded-lg text-sm font-medium bg-accent hover:bg-accent-hover text-fg transition-colors disabled:opacity-50"
             >
               {saving ? "Saving…" : isEditing ? "Update" : "Add"}
@@ -277,9 +277,10 @@ function ExpenseModal({
 export function RecurringExpenses({ expenses }: { expenses: SerializedRecurringExpense[] }) {
   const [modal, setModal] = useState<{ open: boolean; expense?: SerializedRecurringExpense | null }>({ open: false });
 
-  const totalMonthly = expenses.reduce((sum, e) => sum + toMonthly(e.amount, e.frequency), 0);
-  const autoCount   = expenses.filter((e) => e.isAutoPay).length;
-  const manualCount = expenses.filter((e) => !e.isAutoPay).length;
+  const totalMonthly   = expenses.reduce((sum, e) => sum + toMonthly(e.amount, e.frequency), 0);
+  const variableCount  = expenses.filter((e) => e.amount === null).length;
+  const autoCount      = expenses.filter((e) => e.isAutoPay).length;
+  const manualCount    = expenses.filter((e) => !e.isAutoPay).length;
 
   // Sort: manual first (requires action), then by next due date
   const sorted = [...expenses].sort((a, b) => {
@@ -358,11 +359,17 @@ export function RecurringExpenses({ expenses }: { expenses: SerializedRecurringE
 
                   {/* Amount */}
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-fg tabular-nums">
-                      ${expense.amount.toFixed(2)}
-                    </p>
-                    {expense.frequency !== "monthly" && (
-                      <p className="text-xs text-fg-4 tabular-nums">{formatCurrency(monthly)}/mo</p>
+                    {expense.amount !== null ? (
+                      <>
+                        <p className="text-sm font-semibold text-fg tabular-nums">
+                          ${expense.amount.toFixed(2)}
+                        </p>
+                        {expense.frequency !== "monthly" && (
+                          <p className="text-xs text-fg-4 tabular-nums">{formatCurrency(monthly)}/mo</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-fg-3 italic">Variable</p>
                     )}
                   </div>
 
@@ -397,7 +404,12 @@ export function RecurringExpenses({ expenses }: { expenses: SerializedRecurringE
 
             {/* Monthly total footer */}
             <div className="flex items-center justify-between pt-3 mt-1 border-t border-surface-border px-3">
-              <span className="text-xs text-fg-3">Estimated monthly total</span>
+              <span className="text-xs text-fg-3">
+                Estimated monthly total
+                {variableCount > 0 && (
+                  <span className="text-fg-4 ml-1">({variableCount} variable excluded)</span>
+                )}
+              </span>
               <span className="text-sm font-bold text-fg tabular-nums">{formatCurrency(totalMonthly)}/mo</span>
             </div>
           </div>
