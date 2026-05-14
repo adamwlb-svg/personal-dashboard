@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { CATEGORIES, CategoryKey } from "@/lib/calendar";
+import { GREWords } from "@/components/GREWords";
 
 export const dynamic = "force-dynamic";
 
@@ -169,6 +170,10 @@ export default async function DashboardPage() {
         </div>
 
       </div>
+
+      {/* ── GRE Words of the Day ─────────────────────────────── */}
+      <GREWords />
+
     </div>
   );
 }
