@@ -76,8 +76,12 @@ export function PlaidConnect({ connectedCount }: Props) {
         if (data.success) router.refresh();
       } finally {
         setConnecting(false);
+        // Fetch a fresh link token so the button is ready for another connection
+        setLinkToken(null);
+        fetchLinkToken();
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [router]
   );
 
