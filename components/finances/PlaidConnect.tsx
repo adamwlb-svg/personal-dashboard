@@ -61,28 +61,35 @@ export function PlaidConnect({ connectedCount }: Props) {
     ? `${window.location.origin}/finances`
     : "";
 
-  const fetchLinkToken = useCallback(async () => {
+  const fetchLinkToken = useCallback(async (withRedirectUri = false) => {
     setLinkTokenError(null);
     try {
       const res = await fetch("/api/plaid/link-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ redirect_uri: redirectUri }),
+        body: JSON.stringify(withRedirectUri ? { redirect_uri: redirectUri } : {}),
       });
       const d = await res.json();
       if (d.configured && d.link_token) {
         setPlaidConfigured(true);
         setLinkToken(d.link_token);
-        sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
-      } else if (d.configured) {
-        setPlaidConfigured(true);
-        // Plaid is configured but token creation failed
-        const msg = d.error
-          ? (typeof d.error === "object" ? (d.error as { error_message?: string }).error_message ?? JSON.stringify(d.error) : String(d.error))
-          : "Failed to get link token";
+        if (withRedirectUri) sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
+      } else {
+        setPlaidConfigured(d.configured ?? false);
+        const errObj = d.error;
+        const msg = errObj
+          ? (typeof errObj === "object"
+              ? (errObj as { error_message?: string; message?: string }).error_message
+                ?? (errObj as { error_message?: string; message?: string }).message
+                ?? JSON.stringify(errObj)
+              : String(errObj))
+          : `HTTP ${res.status} — no link token returned`;
+        console.error("[Plaid] link token error:", msg, d);
         setLinkTokenError(msg);
       }
     } catch (e) {
+      console.error("[Plaid] fetch failed:", e);
+      setPlaidConfigured(true);
       setLinkTokenError(String(e));
     }
   }, [redirectUri]);
@@ -98,7 +105,7 @@ export function PlaidConnect({ connectedCount }: Props) {
         return;
       }
     }
-    fetchLinkToken();
+    fetchLinkToken(false);
   }, [fetchLinkToken]);
 
   const onSuccess = useCallback(
@@ -121,7 +128,7 @@ export function PlaidConnect({ connectedCount }: Props) {
         setIsOAuthReturn(false);
         // Null out first so key changes, forcing LinkButton to remount with fresh token
         setLinkToken(null);
-        fetchLinkToken();
+        fetchLinkToken(false);
       }
     },
     [router, fetchLinkToken]
@@ -132,7 +139,7 @@ export function PlaidConnect({ connectedCount }: Props) {
       setIsOAuthReturn(false);
       sessionStorage.removeItem(LINK_TOKEN_KEY);
       setLinkToken(null);
-      fetchLinkToken();
+      fetchLinkToken(false);
     }
   }, [isOAuthReturn, fetchLinkToken]);
 
@@ -191,16 +198,17 @@ export function PlaidConnect({ connectedCount }: Props) {
           onExit={onExit}
         />
       ) : linkTokenError ? (
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-red-400 max-w-[200px] truncate" title={linkTokenError}>
-            Plaid error
-          </span>
-          <button
-            onClick={fetchLinkToken}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors"
-          >
-            Retry
-          </button>
+        <div className="flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-red-400 font-medium">Plaid error</span>
+            <button
+              onClick={() => fetchLinkToken(false)}
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+          <p className="text-xs text-red-300/80 max-w-xs text-right">{linkTokenError}</p>
         </div>
       ) : (
         <button
