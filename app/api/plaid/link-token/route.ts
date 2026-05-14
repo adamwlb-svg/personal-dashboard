@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Products, CountryCode } from "plaid";
 import { plaidClient, isPlaidConfigured } from "@/lib/plaid";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   if (!isPlaidConfigured()) {
     return NextResponse.json({ configured: false });
   }
+
+  const body = await req.json().catch(() => ({}));
+  const redirectUri: string | undefined = body.redirect_uri;
 
   try {
     const response = await plaidClient.linkTokenCreate({
@@ -15,6 +18,7 @@ export async function POST() {
       optional_products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: "en",
+      ...(redirectUri ? { redirect_uri: redirectUri } : {}),
     });
 
     return NextResponse.json({ configured: true, link_token: response.data.link_token });

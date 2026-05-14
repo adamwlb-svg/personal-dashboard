@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { usePlaidLink } from "react-plaid-link";
 
+const LINK_TOKEN_KEY = "plaid_link_token";
+
 type Props = {
   connectedCount: number;
 };
@@ -15,22 +17,55 @@ export function PlaidConnect({ connectedCount }: Props) {
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+  const [isOAuthReturn, setIsOAuthReturn] = useState(false);
+
+  const redirectUri = typeof window !== "undefined"
+    ? `${window.location.origin}/finances`
+    : "";
+
+  async function fetchLinkToken() {
+    try {
+      const res = await fetch("/api/plaid/link-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ redirect_uri: redirectUri }),
+      });
+      const d = await res.json();
+      if (d.configured && d.link_token) {
+        setPlaidConfigured(true);
+        setLinkToken(d.link_token);
+        // Persist token so it survives the OAuth redirect round-trip
+        sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
+      } else if (d.configured) {
+        setPlaidConfigured(true);
+      }
+    } catch { /* ignore */ }
+  }
 
   useEffect(() => {
-    fetch("/api/plaid/link-token", { method: "POST" })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.configured) {
-          setPlaidConfigured(true);
-          setLinkToken(d.link_token);
-        }
-      })
-      .catch(() => {});
+    // Detect OAuth return: Plaid appends oauth_state_id to the redirect URI
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("oauth_state_id")) {
+      const stored = sessionStorage.getItem(LINK_TOKEN_KEY);
+      if (stored) {
+        setIsOAuthReturn(true);
+        setPlaidConfigured(true);
+        setLinkToken(stored);
+        return;
+      }
+    }
+    fetchLinkToken();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSuccess = useCallback(
     async (public_token: string) => {
       setConnecting(true);
+      sessionStorage.removeItem(LINK_TOKEN_KEY);
+      // Clean up oauth_state_id from URL if present
+      const url = new URL(window.location.href);
+      url.searchParams.delete("oauth_state_id");
+      window.history.replaceState({}, "", url.toString());
       try {
         const res = await fetch("/api/plaid/exchange-token", {
           method: "POST",
@@ -38,9 +73,7 @@ export function PlaidConnect({ connectedCount }: Props) {
           body: JSON.stringify({ public_token }),
         });
         const data = await res.json();
-        if (data.success) {
-          router.refresh();
-        }
+        if (data.success) router.refresh();
       } finally {
         setConnecting(false);
       }
@@ -48,10 +81,28 @@ export function PlaidConnect({ connectedCount }: Props) {
     [router]
   );
 
+  const onExit = useCallback(() => {
+    // If user exits during OAuth return, fetch a fresh token
+    if (isOAuthReturn) {
+      setIsOAuthReturn(false);
+      sessionStorage.removeItem(LINK_TOKEN_KEY);
+      fetchLinkToken();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOAuthReturn]);
+
   const { open, ready } = usePlaidLink({
     token: linkToken ?? "",
     onSuccess,
+    onExit,
+    // Pass the full current URL (including oauth_state_id) when returning from OAuth
+    ...(isOAuthReturn ? { receivedRedirectUri: window.location.href } : {}),
   });
+
+  // Auto-open Link when returning from OAuth redirect
+  useEffect(() => {
+    if (isOAuthReturn && ready) open();
+  }, [isOAuthReturn, ready, open]);
 
   async function handleSync() {
     setSyncing(true);
