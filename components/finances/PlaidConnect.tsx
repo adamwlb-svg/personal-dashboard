@@ -51,6 +51,7 @@ export function PlaidConnect({ connectedCount }: Props) {
   const router = useRouter();
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [plaidConfigured, setPlaidConfigured] = useState(false);
+  const [linkTokenError, setLinkTokenError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
@@ -61,6 +62,7 @@ export function PlaidConnect({ connectedCount }: Props) {
     : "";
 
   const fetchLinkToken = useCallback(async () => {
+    setLinkTokenError(null);
     try {
       const res = await fetch("/api/plaid/link-token", {
         method: "POST",
@@ -74,8 +76,15 @@ export function PlaidConnect({ connectedCount }: Props) {
         sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
       } else if (d.configured) {
         setPlaidConfigured(true);
+        // Plaid is configured but token creation failed
+        const msg = d.error
+          ? (typeof d.error === "object" ? (d.error as { error_message?: string }).error_message ?? JSON.stringify(d.error) : String(d.error))
+          : "Failed to get link token";
+        setLinkTokenError(msg);
       }
-    } catch { /* ignore */ }
+    } catch (e) {
+      setLinkTokenError(String(e));
+    }
   }, [redirectUri]);
 
   useEffect(() => {
@@ -181,6 +190,18 @@ export function PlaidConnect({ connectedCount }: Props) {
           onSuccess={onSuccess}
           onExit={onExit}
         />
+      ) : linkTokenError ? (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-red-400 max-w-[200px] truncate" title={linkTokenError}>
+            Plaid error
+          </span>
+          <button
+            onClick={fetchLinkToken}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       ) : (
         <button
           disabled
