@@ -7,8 +7,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ configured: false });
   }
 
+  // Read from request body (for OAuth return flow) or fall back to env var
   const body = await req.json().catch(() => ({}));
-  const redirectUri: string | undefined = body.redirect_uri;
+  const redirectUri: string | undefined =
+    body.redirect_uri ?? process.env.PLAID_REDIRECT_URI ?? undefined;
 
   try {
     const response = await plaidClient.linkTokenCreate({

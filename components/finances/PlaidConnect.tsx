@@ -57,23 +57,19 @@ export function PlaidConnect({ connectedCount }: Props) {
   const [syncResult, setSyncResult] = useState<string | null>(null);
   const [isOAuthReturn, setIsOAuthReturn] = useState(false);
 
-  const redirectUri = typeof window !== "undefined"
-    ? `${window.location.origin}/finances`
-    : "";
-
-  const fetchLinkToken = useCallback(async (withRedirectUri = false) => {
+  const fetchLinkToken = useCallback(async () => {
     setLinkTokenError(null);
     try {
       const res = await fetch("/api/plaid/link-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(withRedirectUri ? { redirect_uri: redirectUri } : {}),
+        body: JSON.stringify({}),
       });
       const d = await res.json();
       if (d.configured && d.link_token) {
         setPlaidConfigured(true);
         setLinkToken(d.link_token);
-        if (withRedirectUri) sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
+        sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
       } else {
         setPlaidConfigured(d.configured ?? false);
         const errObj = d.error;
@@ -92,7 +88,7 @@ export function PlaidConnect({ connectedCount }: Props) {
       setPlaidConfigured(true);
       setLinkTokenError(String(e));
     }
-  }, [redirectUri]);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -105,7 +101,7 @@ export function PlaidConnect({ connectedCount }: Props) {
         return;
       }
     }
-    fetchLinkToken(false);
+    fetchLinkToken();
   }, [fetchLinkToken]);
 
   const onSuccess = useCallback(
@@ -128,7 +124,7 @@ export function PlaidConnect({ connectedCount }: Props) {
         setIsOAuthReturn(false);
         // Null out first so key changes, forcing LinkButton to remount with fresh token
         setLinkToken(null);
-        fetchLinkToken(false);
+        fetchLinkToken();
       }
     },
     [router, fetchLinkToken]
@@ -139,7 +135,7 @@ export function PlaidConnect({ connectedCount }: Props) {
       setIsOAuthReturn(false);
       sessionStorage.removeItem(LINK_TOKEN_KEY);
       setLinkToken(null);
-      fetchLinkToken(false);
+      fetchLinkToken();
     }
   }, [isOAuthReturn, fetchLinkToken]);
 
@@ -202,7 +198,7 @@ export function PlaidConnect({ connectedCount }: Props) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-red-400 font-medium">Plaid error</span>
             <button
-              onClick={() => fetchLinkToken(false)}
+              onClick={() => fetchLinkToken()}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors"
             >
               Retry
