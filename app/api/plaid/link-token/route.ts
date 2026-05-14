@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     const response = await plaidClient.linkTokenCreate({
       user: { client_user_id: "personal-dashboard-user" },
       client_name: "Personal Dashboard",
-      products: [Products.Auth],
-      optional_products: [Products.Transactions],
+      products: [Products.Transactions],
+      optional_products: [Products.Investments, Products.Liabilities],
       country_codes: [CountryCode.Us],
       language: "en",
       ...(redirectUri ? { redirect_uri: redirectUri } : {}),
