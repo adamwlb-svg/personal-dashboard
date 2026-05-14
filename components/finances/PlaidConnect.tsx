@@ -6,9 +6,46 @@ import { usePlaidLink } from "react-plaid-link";
 
 const LINK_TOKEN_KEY = "plaid_link_token";
 
-type Props = {
-  connectedCount: number;
-};
+type Props = { connectedCount: number };
+
+// Isolated so usePlaidLink fully reinitializes when token changes
+function LinkButton({
+  token,
+  isOAuthReturn,
+  connecting,
+  onSuccess,
+  onExit,
+}: {
+  token: string;
+  isOAuthReturn: boolean;
+  connecting: boolean;
+  onSuccess: (token: string) => void;
+  onExit: () => void;
+}) {
+  const { open, ready } = usePlaidLink({
+    token,
+    onSuccess,
+    onExit,
+    ...(isOAuthReturn ? { receivedRedirectUri: window.location.href } : {}),
+  });
+
+  useEffect(() => {
+    if (isOAuthReturn && ready) open();
+  }, [isOAuthReturn, ready, open]);
+
+  return (
+    <button
+      onClick={() => open()}
+      disabled={!ready || connecting}
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+      </svg>
+      {connecting ? "Connecting…" : "Connect Bank"}
+    </button>
+  );
+}
 
 export function PlaidConnect({ connectedCount }: Props) {
   const router = useRouter();
@@ -23,7 +60,7 @@ export function PlaidConnect({ connectedCount }: Props) {
     ? `${window.location.origin}/finances`
     : "";
 
-  async function fetchLinkToken() {
+  const fetchLinkToken = useCallback(async () => {
     try {
       const res = await fetch("/api/plaid/link-token", {
         method: "POST",
@@ -34,16 +71,14 @@ export function PlaidConnect({ connectedCount }: Props) {
       if (d.configured && d.link_token) {
         setPlaidConfigured(true);
         setLinkToken(d.link_token);
-        // Persist token so it survives the OAuth redirect round-trip
         sessionStorage.setItem(LINK_TOKEN_KEY, d.link_token);
       } else if (d.configured) {
         setPlaidConfigured(true);
       }
     } catch { /* ignore */ }
-  }
+  }, [redirectUri]);
 
   useEffect(() => {
-    // Detect OAuth return: Plaid appends oauth_state_id to the redirect URI
     const params = new URLSearchParams(window.location.search);
     if (params.get("oauth_state_id")) {
       const stored = sessionStorage.getItem(LINK_TOKEN_KEY);
@@ -55,14 +90,12 @@ export function PlaidConnect({ connectedCount }: Props) {
       }
     }
     fetchLinkToken();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchLinkToken]);
 
   const onSuccess = useCallback(
     async (public_token: string) => {
       setConnecting(true);
       sessionStorage.removeItem(LINK_TOKEN_KEY);
-      // Clean up oauth_state_id from URL if present
       const url = new URL(window.location.href);
       url.searchParams.delete("oauth_state_id");
       window.history.replaceState({}, "", url.toString());
@@ -76,37 +109,23 @@ export function PlaidConnect({ connectedCount }: Props) {
         if (data.success) router.refresh();
       } finally {
         setConnecting(false);
-        // Fetch a fresh link token so the button is ready for another connection
+        setIsOAuthReturn(false);
+        // Null out first so key changes, forcing LinkButton to remount with fresh token
         setLinkToken(null);
         fetchLinkToken();
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router]
+    [router, fetchLinkToken]
   );
 
   const onExit = useCallback(() => {
-    // If user exits during OAuth return, fetch a fresh token
     if (isOAuthReturn) {
       setIsOAuthReturn(false);
       sessionStorage.removeItem(LINK_TOKEN_KEY);
+      setLinkToken(null);
       fetchLinkToken();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOAuthReturn]);
-
-  const { open, ready } = usePlaidLink({
-    token: linkToken ?? "",
-    onSuccess,
-    onExit,
-    // Pass the full current URL (including oauth_state_id) when returning from OAuth
-    ...(isOAuthReturn ? { receivedRedirectUri: window.location.href } : {}),
-  });
-
-  // Auto-open Link when returning from OAuth redirect
-  useEffect(() => {
-    if (isOAuthReturn && ready) open();
-  }, [isOAuthReturn, ready, open]);
+  }, [isOAuthReturn, fetchLinkToken]);
 
   async function handleSync() {
     setSyncing(true);
@@ -153,16 +172,26 @@ export function PlaidConnect({ connectedCount }: Props) {
           {syncing ? "Syncing…" : "Sync Balances"}
         </button>
       )}
-      <button
-        onClick={() => open()}
-        disabled={!ready || connecting}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-fg text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-      >
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-        </svg>
-        {connecting ? "Connecting…" : connectedCount > 0 ? "Connect Another" : "Connect Bank"}
-      </button>
+      {linkToken ? (
+        <LinkButton
+          key={linkToken}
+          token={linkToken}
+          isOAuthReturn={isOAuthReturn}
+          connecting={connecting}
+          onSuccess={onSuccess}
+          onExit={onExit}
+        />
+      ) : (
+        <button
+          disabled
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-fg text-sm font-medium rounded-lg opacity-50"
+        >
+          <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Loading…
+        </button>
+      )}
     </div>
   );
 }
