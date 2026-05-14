@@ -8,10 +8,11 @@ import {
   SerializedFinanceTodo,
   SerializedFinanceChatMessage,
 } from "@/lib/finance";
+import { SerializedRecurringExpense } from "@/components/finances/RecurringExpenses";
 import { FinancesView } from "@/components/finances/FinancesView";
 
 export default async function FinancesPage() {
-  const [accounts, snapshots, goals, todos, chatMessages] = await Promise.all([
+  const [accounts, snapshots, goals, todos, chatMessages, recurringExpenses] = await Promise.all([
     prisma.financialAccount.findMany({
       where: { isActive: true },
       orderBy: { createdAt: "asc" },
@@ -28,6 +29,7 @@ export default async function FinancesPage() {
       orderBy: { createdAt: "asc" },
       take: 50,
     }),
+    prisma.recurringExpense.findMany({ orderBy: { nextDueDate: "asc" } }).catch(() => []),
   ]);
 
   const serializedAccounts: SerializedAccount[] = accounts.map((a) => ({
@@ -78,6 +80,20 @@ export default async function FinancesPage() {
     createdAt: m.createdAt.toISOString(),
   }));
 
+  const serializedExpenses: SerializedRecurringExpense[] = recurringExpenses.map((e) => ({
+    id: e.id,
+    name: e.name,
+    amount: e.amount,
+    frequency: e.frequency,
+    category: e.category,
+    isAutoPay: e.isAutoPay,
+    nextDueDate: e.nextDueDate.toISOString(),
+    notes: e.notes,
+    eventId: e.eventId,
+    createdAt: e.createdAt.toISOString(),
+    updatedAt: e.updatedAt.toISOString(),
+  }));
+
   return (
     <FinancesView
       accounts={serializedAccounts}
@@ -86,6 +102,7 @@ export default async function FinancesPage() {
       todos={serializedTodos}
       chatMessages={serializedMessages}
       aiConfigured={!!process.env.ANTHROPIC_API_KEY}
+      expenses={serializedExpenses}
     />
   );
 }
