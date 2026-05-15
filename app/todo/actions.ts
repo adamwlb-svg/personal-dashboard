@@ -116,6 +116,15 @@ export async function toggleComplete(id: number, completed: boolean) {
   revalidatePath("/todo");
 }
 
+export async function moveTodoDueDate(id: number, newDate: string) {
+  await prisma.task.update({
+    where: { id },
+    data: { dueDate: new Date(newDate) },
+  });
+  revalidatePath("/todo");
+  revalidatePath("/schedule");
+}
+
 export async function deleteTask(id: number) {
   const task = await prisma.task.findUnique({
     where: { id },

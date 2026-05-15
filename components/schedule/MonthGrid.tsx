@@ -24,11 +24,13 @@ type Props = {
   onDayClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
   onMoveEvent: (id: number, newStart: Date, newEnd: Date) => void;
+  onMoveTodo: (id: number, newDate: Date) => void;
 };
 
 const DAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MAX_CHIPS = 3;
 const DRAG_KEY = "text/x-calendar-event";
+const TODO_DRAG_KEY = "text/x-todo-item";
 
 export function MonthGrid({
   currentDate,
@@ -38,9 +40,12 @@ export function MonthGrid({
   onDayClick,
   onEventClick,
   onMoveEvent,
+  onMoveTodo,
 }: Props) {
   const [dragOverDay, setDragOverDay] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
+  const [todoDragOverDay, setTodoDragOverDay] = useState<string | null>(null);
+  const [draggingTodoId, setDraggingTodoId] = useState<number | null>(null);
 
   const days = eachDayOfInterval({
     start: startOfWeek(startOfMonth(currentDate)),
@@ -68,17 +73,10 @@ export function MonthGrid({
     setDragOverDay(null);
   }
 
-  function handleDragOver(e: React.DragEvent, day: Date) {
-    if (!e.dataTransfer.types.includes(DRAG_KEY)) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    setDragOverDay(day.toISOString());
-  }
-
   function handleDragLeave(e: React.DragEvent) {
-    // Only clear if leaving the cell itself, not a child
     if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) {
       setDragOverDay(null);
+      setTodoDragOverDay(null);
     }
   }
 
@@ -86,6 +84,15 @@ export function MonthGrid({
     e.preventDefault();
     setDragOverDay(null);
     setDraggingId(null);
+
+    const todoRaw = e.dataTransfer.getData(TODO_DRAG_KEY);
+    if (todoRaw) {
+      setTodoDragOverDay(null);
+      setDraggingTodoId(null);
+      onMoveTodo(Number(todoRaw), targetDay);
+      return;
+    }
+
     const raw = e.dataTransfer.getData(DRAG_KEY);
     if (!raw) return;
     const { eventId, originalStart, originalEnd } = JSON.parse(raw);
@@ -94,6 +101,16 @@ export function MonthGrid({
     const delta = differenceInCalendarDays(targetDay, origStart);
     if (delta === 0) return;
     onMoveEvent(eventId, addDays(origStart, delta), addDays(origEnd, delta));
+  }
+
+  function handleDragOver(e: React.DragEvent, day: Date) {
+    const hasTodo = e.dataTransfer.types.includes(TODO_DRAG_KEY);
+    const hasEvent = e.dataTransfer.types.includes(DRAG_KEY);
+    if (!hasTodo && !hasEvent) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (hasTodo) setTodoDragOverDay(day.toISOString());
+    else setDragOverDay(day.toISOString());
   }
 
   return (
@@ -121,6 +138,7 @@ export function MonthGrid({
           const inMonth = isSameMonth(day, currentDate);
           const today = isToday(day);
           const isDropTarget = dragOverDay === dayKey;
+          const isTodoDropTarget = todoDragOverDay === dayKey;
 
           return (
             <div
@@ -130,7 +148,7 @@ export function MonthGrid({
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, day)}
               className={`border-b border-r border-surface-border p-1.5 flex flex-col gap-0.5 cursor-pointer transition-colors overflow-hidden
-                ${isDropTarget ? "bg-accent/10 ring-1 ring-inset ring-accent/40" : isSelected ? "bg-accent/5" : "hover:bg-white/[0.02]"}`}
+                ${isDropTarget ? "bg-accent/10 ring-1 ring-inset ring-accent/40" : isTodoDropTarget ? "bg-red-500/10 ring-1 ring-inset ring-red-500/30" : isSelected ? "bg-accent/5" : "hover:bg-white/[0.02]"}`}
             >
               <div className="flex justify-end mb-0.5">
                 <span className={`text-xs w-6 h-6 flex items-center justify-center rounded-full font-medium transition-colors
@@ -167,15 +185,23 @@ export function MonthGrid({
               })}
 
               {dayTodos.slice(0, Math.max(0, MAX_CHIPS - dayEvents.length)).map((todo) => (
-                <a
+                <div
                   key={`todo-${todo.id}`}
-                  href="/todo"
+                  draggable
+                  onDragStart={(e) => {
+                    e.stopPropagation();
+                    setDraggingTodoId(todo.id);
+                    e.dataTransfer.effectAllowed = "move";
+                    e.dataTransfer.setData(TODO_DRAG_KEY, String(todo.id));
+                  }}
+                  onDragEnd={() => { setDraggingTodoId(null); setTodoDragOverDay(null); }}
                   onClick={(e) => e.stopPropagation()}
-                  className="w-full text-left text-xs px-1.5 py-0.5 rounded truncate font-medium transition-opacity hover:opacity-75 bg-red-500/20 text-red-400 flex items-center gap-0.5"
+                  className={`w-full text-left text-xs px-1.5 py-0.5 rounded truncate font-medium transition-opacity bg-red-500/20 text-red-400 flex items-center gap-0.5 cursor-grab active:cursor-grabbing select-none
+                    ${draggingTodoId === todo.id ? "opacity-30" : "hover:opacity-75"}`}
                 >
                   <span className="font-bold flex-shrink-0">!</span>
                   <span className="truncate">{todo.title}</span>
-                </a>
+                </div>
               ))}
 
               {totalItems > MAX_CHIPS && (

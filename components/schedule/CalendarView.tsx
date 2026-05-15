@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { moveEvent } from "@/app/schedule/actions";
+import { moveTodoDueDate } from "@/app/todo/actions";
 import {
   format,
   addMonths,
@@ -65,6 +66,11 @@ export function CalendarView({
 
   const handleMoveEvent = useCallback(async (id: number, newStart: Date, newEnd: Date) => {
     await moveEvent(id, newStart.toISOString(), newEnd.toISOString());
+    router.refresh();
+  }, [router]);
+
+  const handleMoveTodo = useCallback(async (id: number, newDate: Date) => {
+    await moveTodoDueDate(id, newDate.toISOString());
     router.refresh();
   }, [router]);
 
@@ -233,6 +239,7 @@ export function CalendarView({
               }
               onEventClick={openEdit}
               onMoveEvent={handleMoveEvent}
+              onMoveTodo={handleMoveTodo}
             />
           ) : (
             <WeekView
@@ -242,6 +249,7 @@ export function CalendarView({
               onEventClick={openEdit}
               onSlotClick={(date) => openNew(date)}
               onMoveEvent={handleMoveEvent}
+              onMoveTodo={handleMoveTodo}
             />
           )}
         </div>

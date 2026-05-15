@@ -22,6 +22,7 @@ type Props = {
   onEventClick: (event: CalendarEvent) => void;
   onSlotClick: (date: Date) => void;
   onMoveEvent: (id: number, newStart: Date, newEnd: Date) => void;
+  onMoveTodo: (id: number, newDate: Date) => void;
 };
 
 const START_HOUR = 6;
@@ -30,6 +31,7 @@ const HOUR_PX = 64;
 const TOTAL_HEIGHT = (END_HOUR - START_HOUR) * HOUR_PX;
 const hours = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i);
 const DRAG_KEY = "text/x-calendar-event";
+const TODO_DRAG_KEY = "text/x-todo-item";
 
 function eventPosition(event: CalendarEvent) {
   const startH = getHours(event.startTime) + getMinutes(event.startTime) / 60;
@@ -49,9 +51,12 @@ export function WeekView({
   onEventClick,
   onSlotClick,
   onMoveEvent,
+  onMoveTodo,
 }: Props) {
   const [dragOverDay, setDragOverDay] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
+  const [todoDragOverDay, setTodoDragOverDay] = useState<string | null>(null);
+  const [draggingTodoId, setDraggingTodoId] = useState<number | null>(null);
   // Track mouse-Y offset within the dragged event block so drop lands at the right time
   const dragOffsetY = useRef(0);
 
@@ -126,6 +131,34 @@ export function WeekView({
     onMoveEvent(eventId, newStart, newEnd);
   }
 
+  function handleTodoDragStart(e: React.DragEvent, todo: TodoDue) {
+    e.stopPropagation();
+    setDraggingTodoId(todo.id);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData(TODO_DRAG_KEY, String(todo.id));
+  }
+
+  function handleTodoDragEnd() {
+    setDraggingTodoId(null);
+    setTodoDragOverDay(null);
+  }
+
+  function handleTodoDragOver(e: React.DragEvent, day: Date) {
+    if (!e.dataTransfer.types.includes(TODO_DRAG_KEY)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setTodoDragOverDay(day.toISOString());
+  }
+
+  function handleTodoDrop(e: React.DragEvent, targetDay: Date) {
+    const raw = e.dataTransfer.getData(TODO_DRAG_KEY);
+    if (!raw) return;
+    e.preventDefault();
+    setTodoDragOverDay(null);
+    setDraggingTodoId(null);
+    onMoveTodo(Number(raw), targetDay);
+  }
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Day headers */}
@@ -143,30 +176,41 @@ export function WeekView({
       </div>
 
       {/* Due-date strip */}
-      {days.some((day) => todos.some((t) => isSameDay(t.dueDate, day))) && (
-        <div className="flex border-b border-surface-border flex-shrink-0 bg-red-500/5">
-          <div className="w-14 flex-shrink-0 flex items-center justify-end pr-2">
-            <span className="text-xs text-red-400 font-bold">!</span>
-          </div>
-          {days.map((day) => {
-            const dayTodos = todos.filter((t) => isSameDay(t.dueDate, day));
-            return (
-              <div key={day.toISOString()} className="flex-1 border-l border-surface-border/40 py-1 px-1 flex flex-col gap-0.5 min-h-[24px]">
-                {dayTodos.map((todo) => (
-                  <a
-                    key={todo.id}
-                    href="/todo"
-                    className="text-xs px-1.5 py-0.5 rounded truncate font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors flex items-center gap-0.5"
-                  >
-                    <span className="font-bold flex-shrink-0">!</span>
-                    <span className="truncate">{todo.title}</span>
-                  </a>
-                ))}
-              </div>
-            );
-          })}
+      <div className="flex border-b border-surface-border flex-shrink-0 bg-red-500/5 min-h-[28px]">
+        <div className="w-14 flex-shrink-0 flex items-center justify-end pr-2">
+          <span className="text-xs text-red-400 font-bold">!</span>
         </div>
-      )}
+        {days.map((day) => {
+          const dayKey = day.toISOString();
+          const dayTodos = todos.filter((t) => isSameDay(t.dueDate, day));
+          const isTodoDropTarget = todoDragOverDay === dayKey;
+          return (
+            <div
+              key={dayKey}
+              className={`flex-1 border-l border-surface-border/40 py-1 px-1 flex flex-col gap-0.5 min-h-[28px] transition-colors ${isTodoDropTarget ? "bg-red-500/15" : ""}`}
+              onDragOver={(e) => handleTodoDragOver(e, day)}
+              onDragLeave={(e) => {
+                if (!(e.currentTarget as HTMLElement).contains(e.relatedTarget as Node)) setTodoDragOverDay(null);
+              }}
+              onDrop={(e) => handleTodoDrop(e, day)}
+            >
+              {dayTodos.map((todo) => (
+                <div
+                  key={todo.id}
+                  draggable
+                  onDragStart={(e) => handleTodoDragStart(e, todo)}
+                  onDragEnd={handleTodoDragEnd}
+                  className={`text-xs px-1.5 py-0.5 rounded truncate font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors flex items-center gap-0.5 cursor-grab active:cursor-grabbing select-none
+                    ${draggingTodoId === todo.id ? "opacity-30" : ""}`}
+                >
+                  <span className="font-bold flex-shrink-0">!</span>
+                  <span className="truncate">{todo.title}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
 
       {/* Scrollable time grid */}
       <div className="flex flex-1 overflow-y-auto">
