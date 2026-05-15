@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./Sidebar";
+import { GlobalSearch } from "./GlobalSearch";
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-hidden bg-surface flex flex-col">
         {children}
       </main>
+      <GlobalSearch />
     </div>
   );
 }

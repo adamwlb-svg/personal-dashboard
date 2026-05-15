@@ -24,6 +24,7 @@ import { FinanceTodos } from "./FinanceTodos";
 import { PlaidConnect } from "./PlaidConnect";
 import { StockTicker } from "./StockTicker";
 import { RecurringExpenses, SerializedRecurringExpense } from "./RecurringExpenses";
+import { BudgetTracker, SerializedBudgetCategory, SerializedBudgetEntry } from "./BudgetTracker";
 import { updateBalance } from "@/app/finances/actions";
 
 type Props = {
@@ -34,9 +35,11 @@ type Props = {
   chatMessages: SerializedFinanceChatMessage[];
   aiConfigured: boolean;
   expenses: SerializedRecurringExpense[];
+  budgetCategories: SerializedBudgetCategory[];
+  budgetEntries: SerializedBudgetEntry[];
 };
 
-export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, aiConfigured, expenses }: Props) {
+export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, aiConfigured, expenses, budgetCategories, budgetEntries }: Props) {
   const router = useRouter();
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState<SerializedAccount | null>(null);
@@ -250,6 +253,7 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
             )}
           </div>
 
+          <BudgetTracker categories={budgetCategories} entries={budgetEntries} />
           <RecurringExpenses expenses={expenses} />
           <FinanceTodos todos={todos} />
         </section>

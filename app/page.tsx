@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { CATEGORIES, CategoryKey } from "@/lib/calendar";
+import { ACCOUNT_TYPES, AccountType } from "@/lib/finance";
 import { GREWords } from "@/components/GREWords";
 import { WeatherWidget } from "@/components/WeatherWidget";
+import { CountdownWidget, SerializedCountdown } from "@/components/CountdownWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -48,27 +50,51 @@ const PRIORITY_COLORS: Record<string, string> = {
 
 export default async function DashboardPage() {
   const { monday, sunday } = getWeekBounds();
+  const now = new Date();
 
   let events: { id: number; title: string; startTime: Date; endTime: Date; allDay: boolean; category: string }[] = [];
   let todos: { id: number; title: string; priority: string; dueDate: Date | null; completed: boolean }[] = [];
+  let countdowns: SerializedCountdown[] = [];
+
+  // Pulse row data
+  let weekWorkoutCount = 0;
+  let overdueCount = 0;
+  let openTaskCount = 0;
+  let nextEvent: { title: string; startTime: Date } | null = null;
+  let netWorth = 0;
 
   try {
-    [events, todos] = await Promise.all([
+    const [eventsData, todosData, workoutCount, overdue, openTasks, nextEv, accounts, cdData] = await Promise.all([
       prisma.event.findMany({
         where: { startTime: { gte: monday, lte: sunday } },
         orderBy: { startTime: "asc" },
         select: { id: true, title: true, startTime: true, endTime: true, allDay: true, category: true },
       }),
       prisma.task.findMany({
-        where: {
-          completed: false,
-          parentId: null,
-          dueDate: { gte: monday, lte: sunday },
-        },
+        where: { completed: false, parentId: null, dueDate: { gte: monday, lte: sunday } },
         orderBy: [{ dueDate: "asc" }, { priority: "asc" }],
         select: { id: true, title: true, priority: true, dueDate: true, completed: true },
       }),
+      prisma.workoutEntry.count({ where: { loggedAt: { gte: monday, lte: sunday } } }).catch(() => 0),
+      prisma.task.count({ where: { completed: false, parentId: null, dueDate: { lt: now } } }).catch(() => 0),
+      prisma.task.count({ where: { completed: false, parentId: null } }).catch(() => 0),
+      prisma.event.findFirst({ where: { startTime: { gte: now } }, orderBy: { startTime: "asc" }, select: { title: true, startTime: true } }).catch(() => null),
+      prisma.financialAccount.findMany({ where: { isActive: true }, select: { balance: true, type: true } }).catch(() => []),
+      prisma.countdown.findMany({ orderBy: { date: "asc" } }).catch(() => []),
     ]);
+    events = eventsData;
+    todos = todosData;
+    weekWorkoutCount = workoutCount;
+    overdueCount = overdue;
+    openTaskCount = openTasks;
+    nextEvent = nextEv;
+    countdowns = cdData.map((c) => ({ id: c.id, title: c.title, emoji: c.emoji, date: c.date.toISOString() }));
+
+    // Net worth calculation
+    for (const a of accounts) {
+      const isLiability = ACCOUNT_TYPES[a.type as AccountType]?.isLiability ?? false;
+      netWorth += isLiability ? -Math.abs(a.balance) : a.balance;
+    }
   } catch {
     // DB not ready
   }
@@ -97,6 +123,49 @@ export default async function DashboardPage() {
 
       {/* ── Weather ──────────────────────────────────────────── */}
       <WeatherWidget />
+
+      {/* ── Pulse row ────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          {
+            label: "Net Worth",
+            value: netWorth === 0 ? "—" : `${netWorth >= 0 ? "+" : ""}${Math.abs(netWorth) >= 1000 ? `$${(Math.abs(netWorth) / 1000).toFixed(0)}k` : `$${Math.abs(netWorth).toFixed(0)}`}`,
+            color: netWorth >= 0 ? "text-emerald-400" : "text-red-400",
+            sub: "total net worth",
+            icon: "💰",
+          },
+          {
+            label: "Workouts",
+            value: weekWorkoutCount > 0 ? `${weekWorkoutCount}` : "0",
+            color: weekWorkoutCount > 0 ? "text-teal-400" : "text-fg-3",
+            sub: "this week",
+            icon: "🏋️",
+          },
+          {
+            label: "Tasks",
+            value: `${openTaskCount}`,
+            color: overdueCount > 0 ? "text-red-400" : "text-fg-2",
+            sub: overdueCount > 0 ? `${overdueCount} overdue` : "open",
+            icon: "✅",
+          },
+          {
+            label: "Next Event",
+            value: nextEvent ? nextEvent.startTime.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—",
+            color: "text-blue-400",
+            sub: nextEvent ? nextEvent.title : "nothing upcoming",
+            icon: "📅",
+          },
+        ].map((stat) => (
+          <div key={stat.label} className="bg-surface-raised border border-surface-border rounded-xl p-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-sm">{stat.icon}</span>
+              <p className="text-xs text-fg-3">{stat.label}</p>
+            </div>
+            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-fg-3 mt-0.5 truncate">{stat.sub}</p>
+          </div>
+        ))}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -174,6 +243,9 @@ export default async function DashboardPage() {
         </div>
 
       </div>
+
+      {/* ── Countdowns ───────────────────────────────────────── */}
+      <CountdownWidget countdowns={countdowns} />
 
       {/* ── GRE Words of the Day ─────────────────────────────── */}
       <GREWords />
