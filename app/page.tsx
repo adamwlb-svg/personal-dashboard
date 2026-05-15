@@ -129,7 +129,7 @@ export default async function DashboardPage() {
 
       {/* Page title */}
       <div>
-        <h1 className="text-2xl font-semibold text-fg">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-fg">Adam&apos;s Personal Dashboard</h1>
         <p className="text-sm text-fg-2 mt-0.5">Week of {weekLabel}</p>
       </div>
 
