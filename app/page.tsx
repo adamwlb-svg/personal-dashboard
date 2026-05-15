@@ -125,7 +125,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="p-8 overflow-y-auto flex-1 max-w-5xl mx-auto w-full space-y-10">
+    <div className="p-8 overflow-y-auto flex-1 max-w-5xl mx-auto w-full space-y-14">
 
       {/* Page title */}
       <div>
@@ -134,15 +134,15 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── TODAY ────────────────────────────────────────────── */}
-      <section className="space-y-4">
+      <section className="space-y-5">
         <SectionDivider label="Today" color="bg-sky-400" />
         <WeatherWidget />
       </section>
 
       {/* ── AT A GLANCE ──────────────────────────────────────── */}
-      <section className="space-y-4">
+      <section className="space-y-5">
         <SectionDivider label="At a Glance" color="bg-indigo-400" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             {
               label: "Net Worth",
@@ -179,12 +179,12 @@ export default async function DashboardPage() {
               icon: "📅",
             },
           ].map((stat) => (
-            <div key={stat.label} className="bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col gap-1">
+            <div key={stat.label} className="bg-surface-raised border border-surface-border rounded-xl p-5 flex flex-col gap-1.5">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm">{stat.icon}</span>
-                <p className="text-xs text-fg-3">{stat.label}</p>
+                <span className="text-base">{stat.icon}</span>
+                <p className="text-xs text-fg-3 font-medium">{stat.label}</p>
               </div>
-              <p className={`text-2xl font-bold leading-tight ${stat.color}`}>{stat.value}</p>
+              <p className={`text-3xl font-bold leading-tight ${stat.color}`}>{stat.value}</p>
               <p className="text-xs text-fg-3 truncate">{stat.sub}</p>
             </div>
           ))}
@@ -192,20 +192,20 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── THIS WEEK ────────────────────────────────────────── */}
-      <section className="space-y-4">
+      <section className="space-y-5">
         <SectionDivider label="This Week" color="bg-blue-400" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* Schedule */}
-          <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
+          <div className="bg-surface-raised border border-surface-border rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-fg">📅 Schedule</h2>
               <span className="text-xs text-fg-3">{events.length} event{events.length !== 1 ? "s" : ""}</span>
             </div>
             {events.length === 0 ? (
-              <p className="text-xs text-fg-3 text-center py-8">No events this week.</p>
+              <p className="text-xs text-fg-3 text-center py-10">No events this week.</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {sortedDays.map(([dateKey, dayEvents]) => (
                   <div key={dateKey}>
                     <p className="text-[11px] font-bold text-fg-3 uppercase tracking-[0.1em] mb-1.5">
@@ -232,7 +232,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Todos */}
-          <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
+          <div className="bg-surface-raised border border-surface-border rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-fg">✅ Due This Week</h2>
               <span className="text-xs text-fg-3">{sortedTodos.length} task{sortedTodos.length !== 1 ? "s" : ""}</span>
@@ -244,7 +244,7 @@ export default async function DashboardPage() {
                 <p className="text-xs text-fg-3 mt-1">No tasks due before Sunday.</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {sortedTodos.map((todo) => (
                   <div key={todo.id} className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded border border-surface-border flex-shrink-0" />
@@ -267,13 +267,13 @@ export default async function DashboardPage() {
       </section>
 
       {/* ── COUNTDOWNS ───────────────────────────────────────── */}
-      <section className="space-y-4">
+      <section className="space-y-5">
         <SectionDivider label="Countdowns" color="bg-amber-400" />
         <CountdownWidget countdowns={countdowns} />
       </section>
 
       {/* ── LEARNING ─────────────────────────────────────────── */}
-      <section className="space-y-4">
+      <section className="space-y-5">
         <SectionDivider label="Learning" color="bg-violet-400" />
         <GREWords />
       </section>
