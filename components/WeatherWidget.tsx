@@ -181,24 +181,24 @@ export function WeatherWidget() {
   const futureDays = data.daily.slice(1); // skip today
 
   return (
-    <div className="bg-surface-raised border border-surface-border rounded-xl p-5 space-y-4">
+    <div className="bg-surface-raised border border-surface-border rounded-xl p-4 space-y-3">
       {/* Current conditions */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-5xl leading-none">{emoji}</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl leading-none">{emoji}</span>
           <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-fg tracking-tight">{data.current.temp}°</span>
-              <span className="text-sm text-fg-3 font-medium">{label}</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold text-fg tracking-tight">{data.current.temp}°</span>
+              <span className="text-xs text-fg-3 font-medium">{label}</span>
             </div>
-            <p className="text-xs text-fg-3 mt-0.5">
+            <p className="text-[11px] text-fg-3">
               Feels like {data.current.feelsLike}° · Wind {data.current.windMph} mph
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm font-medium text-fg-2">{data.city}</p>
-          <p className="text-xs text-fg-3 mt-0.5">
+          <p className="text-xs font-medium text-fg-2">{data.city}</p>
+          <p className="text-[11px] text-fg-3">
             {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
           </p>
         </div>
@@ -207,9 +207,9 @@ export function WeatherWidget() {
       {/* Today's hourly strip */}
       {data.todayHourly.length > 0 && (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-fg-3 mb-2">Today&apos;s Forecast</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-3 mb-1.5">Today&apos;s Forecast</p>
           <div className="overflow-x-auto -mx-1 px-1">
-            <div className="flex gap-1.5" style={{ minWidth: "max-content" }}>
+            <div className="flex gap-1" style={{ minWidth: "max-content" }}>
               {data.todayHourly.map((slot) => {
                 const { emoji: slotEmoji } = wmoLabel(slot.code);
                 const isCurrent = slot.hour === nowHour || (nowHour < TODAY_START_HOUR && slot.hour === TODAY_START_HOUR);
@@ -217,20 +217,20 @@ export function WeatherWidget() {
                 return (
                   <div
                     key={slot.hour}
-                    className={`flex flex-col items-center gap-1 py-2 px-2.5 rounded-lg border min-w-[52px] transition-colors
+                    className={`flex flex-col items-center gap-0.5 py-1.5 px-2 rounded-lg border min-w-[44px] transition-colors
                       ${isCurrent
                         ? "bg-accent/15 border-accent/30"
                         : isPast
                         ? "bg-surface/50 border-surface-border opacity-50"
                         : "bg-surface border-surface-border"}`}
                   >
-                    <span className={`text-[11px] font-semibold ${isCurrent ? "text-accent" : "text-fg-3"}`}>
+                    <span className={`text-[10px] font-semibold ${isCurrent ? "text-accent" : "text-fg-3"}`}>
                       {formatHour(slot.hour)}
                     </span>
-                    <span className="text-base leading-none">{slotEmoji}</span>
-                    <span className="text-xs font-semibold text-fg">{slot.temp}°</span>
+                    <span className="text-sm leading-none">{slotEmoji}</span>
+                    <span className="text-[11px] font-semibold text-fg">{slot.temp}°</span>
                     {slot.precipPct >= 20 && (
-                      <span className="text-[10px] text-blue-400">{slot.precipPct}%</span>
+                      <span className="text-[9px] text-blue-400">{slot.precipPct}%</span>
                     )}
                   </div>
                 );
@@ -243,8 +243,8 @@ export function WeatherWidget() {
       {/* Upcoming days */}
       {futureDays.length > 0 && (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-fg-3 mb-2">Upcoming</p>
-          <div className="flex gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-fg-3 mb-1.5">Upcoming</p>
+          <div className="flex gap-1.5">
             {futureDays.map((day) => {
               const d = new Date(day.date + "T12:00:00");
               const { emoji: dayEmoji } = wmoLabel(day.code);
@@ -252,16 +252,16 @@ export function WeatherWidget() {
               return (
                 <div
                   key={day.date}
-                  className="flex-1 flex flex-col items-center gap-1 py-2.5 px-1 rounded-lg bg-surface border border-surface-border"
+                  className="flex-1 flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg bg-surface border border-surface-border"
                 >
-                  <span className="text-[11px] font-semibold uppercase tracking-wide text-fg-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-3">
                     {DAY_NAMES[d.getDay()]}
                   </span>
-                  <span className="text-lg leading-none">{dayEmoji}</span>
-                  <span className="text-xs font-semibold text-fg">{day.high}°</span>
-                  <span className="text-xs text-fg-3">{day.low}°</span>
+                  <span className="text-sm leading-none">{dayEmoji}</span>
+                  <span className="text-[11px] font-semibold text-fg">{day.high}°</span>
+                  <span className="text-[11px] text-fg-3">{day.low}°</span>
                   {showPrecip && (
-                    <span className="text-[10px] text-blue-400">{day.precipIn.toFixed(2)}&quot;</span>
+                    <span className="text-[9px] text-blue-400">{day.precipIn.toFixed(2)}&quot;</span>
                   )}
                 </div>
               );

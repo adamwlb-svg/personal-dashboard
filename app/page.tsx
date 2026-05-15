@@ -133,9 +133,9 @@ export default async function DashboardPage() {
         <p className="text-sm text-fg-2 mt-0.5">Week of {weekLabel}</p>
       </div>
 
-      {/* ── TODAY ────────────────────────────────────────────── */}
+      {/* ── WEATHER ──────────────────────────────────────────── */}
       <section className="space-y-5">
-        <SectionDivider label="Today" color="bg-sky-400" />
+        <SectionDivider label="Weather" color="bg-sky-400" />
         <WeatherWidget />
       </section>
 
