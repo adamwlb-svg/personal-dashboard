@@ -19,6 +19,7 @@ import { SupplementTracker } from "./SupplementTracker";
 import { ExerciseLog } from "./ExerciseLog";
 import { HealthTodos } from "./HealthTodos";
 import { HealthChat } from "./HealthChat";
+import { KeyContacts, SerializedContact } from "./KeyContacts";
 
 type Props = {
   appointments: SerializedAppointment[];
@@ -29,13 +30,14 @@ type Props = {
   todos: SerializedFinanceTodo[];
   chatMessages: SerializedChatMessage[];
   aiConfigured: boolean;
+  contacts: SerializedContact[];
 };
 
 // Only weight remains — sleep and calories removed per user request
 const METRIC_ORDER: MetricType[] = ["weight"];
 
 export function HealthView({
-  appointments, metrics, supplements, dailyStack, workouts, todos, chatMessages, aiConfigured,
+  appointments, metrics, supplements, dailyStack, workouts, todos, chatMessages, aiConfigured, contacts,
 }: Props) {
   const todaySupplements = getTodaySupplements(supplements);
   const weekWorkouts = getWeekWorkouts(workouts, getWeekStart(new Date()));
@@ -128,7 +130,10 @@ export function HealthView({
         <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
       </div>
 
-      {/* 6. AI Assistant */}
+      {/* 6. Key Contacts */}
+      <KeyContacts contacts={contacts} />
+
+      {/* 7. AI Assistant */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium text-fg-2 uppercase tracking-wider">AI Assistant</h2>

@@ -20,12 +20,13 @@ export default async function HealthPage() {
   let dailyStack: Awaited<ReturnType<typeof prisma.dailySupplement.findMany>> = [];
   let workouts: Awaited<ReturnType<typeof prisma.workoutEntry.findMany>> = [];
   let todos: Awaited<ReturnType<typeof prisma.task.findMany>> = [];
+  let contacts: Awaited<ReturnType<typeof prisma.healthContact.findMany>> = [];
 
   try {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    [appointments, metrics, chatMessages, supplements, dailyStack, workouts, todos] = await Promise.all([
+    [appointments, metrics, chatMessages, supplements, dailyStack, workouts, todos, contacts] = await Promise.all([
       prisma.event.findMany({
         where: { category: "health", startTime: { gte: new Date() } },
         orderBy: { startTime: "asc" },
@@ -51,6 +52,7 @@ export default async function HealthPage() {
         where: { category: "health", parentId: null },
         orderBy: [{ completed: "asc" }, { priority: "asc" }, { dueDate: "asc" }],
       }),
+      prisma.healthContact.findMany({ orderBy: { createdAt: "asc" } }).catch(() => []),
     ]);
   } catch {
     // Database not yet migrated — render empty state
@@ -92,6 +94,16 @@ export default async function HealthPage() {
     completed: t.completed, notes: t.notes,
   }));
 
+  const serializedContacts = contacts.map((c) => ({
+    id: c.id,
+    name: c.name,
+    role: c.role,
+    phone: c.phone,
+    email: c.email,
+    address: c.address,
+    notes: c.notes,
+  }));
+
   return (
     <div className="p-8 overflow-y-auto flex-1">
       <HealthView
@@ -103,6 +115,7 @@ export default async function HealthPage() {
         todos={serializedTodos}
         chatMessages={serializedMessages}
         aiConfigured={!!process.env.ANTHROPIC_API_KEY}
+        contacts={serializedContacts}
       />
     </div>
   );

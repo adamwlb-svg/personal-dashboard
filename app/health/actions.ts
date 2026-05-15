@@ -126,3 +126,48 @@ export async function deleteWorkout(id: number) {
   await prisma.workoutEntry.delete({ where: { id } });
   revalidatePath("/health");
 }
+
+// ── Health Contacts ───────────────────────────────────────────────────────────
+
+type ContactInput = {
+  name: string;
+  role: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  notes?: string;
+};
+
+export async function createContact(data: ContactInput) {
+  await prisma.healthContact.create({
+    data: {
+      name: data.name,
+      role: data.role,
+      phone: data.phone || null,
+      email: data.email || null,
+      address: data.address || null,
+      notes: data.notes || null,
+    },
+  });
+  revalidatePath("/health");
+}
+
+export async function updateContact(id: number, data: ContactInput) {
+  await prisma.healthContact.update({
+    where: { id },
+    data: {
+      name: data.name,
+      role: data.role,
+      phone: data.phone || null,
+      email: data.email || null,
+      address: data.address || null,
+      notes: data.notes || null,
+    },
+  });
+  revalidatePath("/health");
+}
+
+export async function deleteContact(id: number) {
+  await prisma.healthContact.delete({ where: { id } });
+  revalidatePath("/health");
+}
