@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CATEGORIES, CategoryKey } from "@/lib/calendar";
 import { GREWords } from "@/components/GREWords";
+import { WeatherWidget } from "@/components/WeatherWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,9 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-semibold text-fg">Dashboard</h1>
         <p className="text-sm text-fg-3 mt-0.5">Week of {weekLabel}</p>
       </div>
+
+      {/* ── Weather ──────────────────────────────────────────── */}
+      <WeatherWidget />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
