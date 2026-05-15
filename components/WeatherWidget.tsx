@@ -189,7 +189,7 @@ export function WeatherWidget() {
               <span className="text-xs font-semibold text-fg">{day.high}°</span>
               <span className="text-xs text-fg-3">{day.low}°</span>
               {showPrecip && (
-                <span className="text-[10px] text-blue-400">{day.precipIn.toFixed(2)}"</span>
+                <span className="text-[10px] text-blue-400">{day.precipIn.toFixed(2)}&quot;</span>
               )}
             </div>
           );
