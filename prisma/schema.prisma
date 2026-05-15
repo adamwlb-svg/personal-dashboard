@@ -177,6 +177,17 @@ model HealthContact {
   updatedAt DateTime @updatedAt
 }
 
+model QuickLink {
+  id        Int      @id @default(autoincrement())
+  title     String
+  url       String
+  category  String   @default("personal")
+  emoji     String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model FinancialGoal {
   id            Int       @id @default(autoincrement())
   name          String
