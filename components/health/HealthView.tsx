@@ -33,8 +33,17 @@ type Props = {
   contacts: SerializedContact[];
 };
 
-// Only weight remains — sleep and calories removed per user request
 const METRIC_ORDER: MetricType[] = ["weight"];
+
+function SectionDivider({ label, color }: { label: string; color: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className={`w-1 h-4 rounded-full flex-shrink-0 ${color}`} />
+      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-3 flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-surface-border" />
+    </div>
+  );
+}
 
 export function HealthView({
   appointments, metrics, supplements, dailyStack, workouts, todos, chatMessages, aiConfigured, contacts,
@@ -44,26 +53,29 @@ export function HealthView({
   const weekMinutes = weekWorkouts.reduce((s, w) => s + w.minutes, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
+
+      {/* Page title */}
       <div>
         <h1 className="text-2xl font-semibold text-fg">Health</h1>
-        <p className="text-sm text-fg-2 mt-0.5">Track your wellbeing and appointments.</p>
+        <p className="text-sm text-fg-2 mt-0.5">Track your wellbeing, habits, and care providers.</p>
       </div>
 
-      {/* 1. Appointments + Snapshot */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <AppointmentsCard appointments={appointments} />
+      {/* ── OVERVIEW ─────────────────────────────────────────────── */}
+      <section className="space-y-4">
+        <SectionDivider label="Overview" color="bg-teal-400" />
 
+        {/* Snapshot stats */}
         <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-fg mb-4">📊 Snapshot</h3>
+          <h3 className="text-sm font-semibold text-fg mb-4">📊 At a Glance</h3>
           <div className="grid grid-cols-2 gap-3 mb-4">
             {[
               { label: "Exercise",    value: weekMinutes > 0 ? `${weekMinutes} min` : null, sub: "this week",  color: "text-emerald-400" },
-              { label: "Supplements", value: todaySupplements.length > 0 ? `${todaySupplements.length}` : null, sub: "today", color: "text-pink-400" },
+              { label: "Supplements", value: todaySupplements.length > 0 ? `${todaySupplements.length}` : null, sub: "logged today", color: "text-pink-400" },
             ].map((item) => (
-              <div key={item.label} className="text-center">
-                <p className={`text-2xl font-semibold ${item.color}`}>{item.value ?? "—"}</p>
-                <p className="text-xs text-fg-3 mt-0.5">{item.label}</p>
+              <div key={item.label} className="text-center py-2">
+                <p className={`text-3xl font-bold ${item.color}`}>{item.value ?? "—"}</p>
+                <p className="text-xs font-medium text-fg-2 mt-1">{item.label}</p>
                 {item.value && <p className="text-xs text-fg-3">{item.sub}</p>}
               </div>
             ))}
@@ -78,75 +90,79 @@ export function HealthView({
             </div>
           )}
         </div>
-      </div>
 
-      {/* 2. Health To-Dos */}
-      <HealthTodos todos={todos} />
-
-      {/* 3. Wearable Sync */}
-      <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-fg flex items-center gap-2">
-            <span>⌚</span> Wearable Sync
-          </h3>
-          <span className="text-xs text-fg-3 bg-surface px-2 py-0.5 rounded-full border border-surface-border">
-            Coming Soon
-          </span>
-        </div>
-        <p className="text-xs text-fg-3 leading-relaxed mb-4">
-          Automatically sync steps, heart rate, sleep stages, and workouts from your Fitbit Charge 6.
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { icon: "👣", label: "Steps",        sub: "Daily step count" },
-            { icon: "❤️", label: "Heart Rate",   sub: "Resting + zones" },
-            { icon: "🌙", label: "Sleep Stages", sub: "Deep, REM, light" },
-            { icon: "🏋️", label: "Workouts",     sub: "Auto-detected" },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-2 opacity-40">
-              <span className="text-base">{item.icon}</span>
-              <div>
-                <p className="text-xs font-medium text-fg-2">{item.label}</p>
-                <p className="text-xs text-fg-3">{item.sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 4. Metrics — weight only */}
-      <div>
-        <h2 className="text-sm font-medium text-fg-2 uppercase tracking-wider mb-3">Metrics</h2>
+        {/* Weight metric */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {METRIC_ORDER.map((type) => (
             <MetricCard key={type} type={type} metrics={metrics} />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* 5. Exercise (weekly) + Supplements */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ExerciseLog workouts={workouts} />
-        <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
-      </div>
+      {/* ── APPOINTMENTS & CARE ──────────────────────────────────── */}
+      <section className="space-y-4">
+        <SectionDivider label="Appointments & Care" color="bg-blue-400" />
+        <AppointmentsCard appointments={appointments} />
+        <KeyContacts contacts={contacts} />
+      </section>
 
-      {/* 6. Key Contacts */}
-      <KeyContacts contacts={contacts} />
+      {/* ── DAILY TRACKING ───────────────────────────────────────── */}
+      <section className="space-y-4">
+        <SectionDivider label="Daily Tracking" color="bg-violet-400" />
+        <HealthTodos todos={todos} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ExerciseLog workouts={workouts} />
+          <SupplementTracker supplements={supplements} dailyStack={dailyStack} />
+        </div>
+      </section>
 
-      {/* 7. AI Assistant */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-fg-2 uppercase tracking-wider">AI Assistant</h2>
+      {/* ── TOOLS ────────────────────────────────────────────────── */}
+      <section className="space-y-4">
+        <SectionDivider label="Tools" color="bg-slate-400" />
+
+        {/* Wearable Sync */}
+        <div className="bg-surface-raised border border-surface-border rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-fg flex items-center gap-2">
+              <span>⌚</span> Wearable Sync
+            </h3>
+            <span className="text-xs text-fg-3 bg-surface px-2 py-0.5 rounded-full border border-surface-border">
+              Coming Soon
+            </span>
+          </div>
+          <p className="text-xs text-fg-3 leading-relaxed mb-4">
+            Automatically sync steps, heart rate, sleep stages, and workouts from your Fitbit Charge 6.
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { icon: "👣", label: "Steps",        sub: "Daily step count" },
+              { icon: "❤️", label: "Heart Rate",   sub: "Resting + zones" },
+              { icon: "🌙", label: "Sleep Stages", sub: "Deep, REM, light" },
+              { icon: "🏋️", label: "Workouts",     sub: "Auto-detected" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-2 opacity-40">
+                <span className="text-base">{item.icon}</span>
+                <div>
+                  <p className="text-xs font-medium text-fg-2">{item.label}</p>
+                  <p className="text-xs text-fg-3">{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Assistant */}
+        <div>
           {aiConfigured && (
-            <p className="text-xs text-fg-3">
-              Say{" "}
-              <span className="text-fg-2">&ldquo;ran 30 min&rdquo;</span> or{" "}
-              <span className="text-fg-2">&ldquo;took Vitamin D 2000mg&rdquo;</span> to log automatically
+            <p className="text-xs text-fg-3 mb-3">
+              Say <span className="text-fg-2">&ldquo;ran 30 min&rdquo;</span> or{" "}
+              <span className="text-fg-2">&ldquo;took Vitamin D 2000mg&rdquo;</span> to log automatically.
             </p>
           )}
+          <HealthChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
         </div>
-        <HealthChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
-      </div>
+      </section>
+
     </div>
   );
 }

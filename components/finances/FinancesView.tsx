@@ -106,53 +106,117 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="max-w-6xl mx-auto p-6 space-y-10">
 
-        {/* ── Net Worth Header + Chart ──────────────────────────── */}
-        <div className="bg-surface-raised border border-surface-border rounded-2xl p-5 space-y-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs text-fg-3 uppercase tracking-wider mb-1">Net Worth</p>
-              <div className="flex items-baseline gap-3">
-                <p className={`text-4xl font-bold tracking-tight ${netWorth >= 0 ? "text-fg" : "text-red-400"}`}>
-                  {formatCurrency(netWorth)}
-                </p>
-                {monthChange !== null && (
-                  <span className={`text-sm font-medium ${monthChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                    {monthChange >= 0 ? "+" : ""}{formatCurrency(monthChange, true)} this month
-                  </span>
-                )}
+        {/* Page title */}
+        <div>
+          <h1 className="text-2xl font-semibold text-fg">Finances</h1>
+          <p className="text-sm text-fg-2 mt-0.5">Track your net worth, accounts, goals, and spending.</p>
+        </div>
+
+        {/* ── NET WORTH ─────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <SectionDivider label="Net Worth" color="bg-indigo-400" />
+
+          <div className="bg-surface-raised border border-surface-border rounded-2xl p-5 space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-fg-3 uppercase tracking-wider mb-1">Total Net Worth</p>
+                <div className="flex items-baseline gap-3">
+                  <p className={`text-4xl font-bold tracking-tight ${netWorth >= 0 ? "text-fg" : "text-red-400"}`}>
+                    {formatCurrency(netWorth)}
+                  </p>
+                  {monthChange !== null && (
+                    <span className={`text-sm font-medium ${monthChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {monthChange >= 0 ? "+" : ""}{formatCurrency(monthChange, true)} this month
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
+            <NetWorthChart data={netWorthHistory} />
           </div>
-          <NetWorthChart data={netWorthHistory} />
-        </div>
 
-        {/* ── Key Metrics ───────────────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <MetricCard label="Liquid" value={formatCurrency(liquid, true)} sub="Checking + Savings" color="text-blue-400" />
-          <MetricCard label="Invested" value={formatCurrency(invested, true)} sub="Investment accounts" color="text-violet-400" />
-          <MetricCard label="Total Debt" value={formatCurrency(liabilities, true)} sub="All liabilities" color="text-red-400" />
-          <MetricCard
-            label="Debt-to-Asset"
-            value={assets > 0 ? `${((liabilities / assets) * 100).toFixed(0)}%` : "—"}
-            sub={liabilities / assets < 0.3 ? "Healthy ratio" : liabilities / assets < 0.5 ? "Moderate" : "High"}
-            color={liabilities / assets < 0.3 ? "text-emerald-400" : liabilities / assets < 0.5 ? "text-yellow-400" : "text-red-400"}
-          />
-        </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <MetricCard label="Liquid" value={formatCurrency(liquid, true)} sub="Checking + Savings" color="text-blue-400" />
+            <MetricCard label="Invested" value={formatCurrency(invested, true)} sub="Investment accounts" color="text-violet-400" />
+            <MetricCard label="Total Debt" value={formatCurrency(liabilities, true)} sub="All liabilities" color="text-red-400" />
+            <MetricCard
+              label="Debt-to-Asset"
+              value={assets > 0 ? `${((liabilities / assets) * 100).toFixed(0)}%` : "—"}
+              sub={liabilities / assets < 0.3 ? "Healthy ratio" : liabilities / assets < 0.5 ? "Moderate" : "High"}
+              color={liabilities / assets < 0.3 ? "text-emerald-400" : liabilities / assets < 0.5 ? "text-yellow-400" : "text-red-400"}
+            />
+          </div>
+        </section>
 
-        {/* ── To-Dos ───────────────────────────────────────────── */}
-        <FinanceTodos todos={todos} />
+        {/* ── ACCOUNTS ──────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <SectionDivider label="Accounts" color="bg-blue-400" />
 
-        {/* ── Allocation + Goals ────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex items-center justify-end gap-2">
+            <PlaidConnect connectedCount={plaidConnectedCount} />
+            <button
+              onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Manual
+            </button>
+          </div>
+
+          {accounts.length === 0 ? (
+            <div className="bg-surface-raised border border-surface-border rounded-2xl p-10 text-center">
+              <p className="text-2xl mb-2">💳</p>
+              <p className="text-sm font-medium text-fg-2">No accounts yet</p>
+              <p className="text-xs text-fg-3 mt-1 mb-4">
+                Connect your bank or add accounts manually to track your net worth.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {assetAccounts.length > 0 && (
+                <AccountGroup
+                  title="Assets"
+                  total={assets}
+                  accounts={assetAccounts}
+                  sparklineData={sparklineData}
+                  editingBalance={editingBalance}
+                  setEditingBalance={setEditingBalance}
+                  onBalanceSave={handleBalanceSave}
+                  onEdit={(a) => { setEditingAccount(a); setShowAccountModal(true); }}
+                />
+              )}
+              {liabilityAccounts.length > 0 && (
+                <AccountGroup
+                  title="Liabilities"
+                  total={liabilities}
+                  accounts={liabilityAccounts}
+                  sparklineData={sparklineData}
+                  editingBalance={editingBalance}
+                  setEditingBalance={setEditingBalance}
+                  onBalanceSave={handleBalanceSave}
+                  onEdit={(a) => { setEditingAccount(a); setShowAccountModal(true); }}
+                />
+              )}
+            </div>
+          )}
+
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-5">
             <h3 className="text-sm font-semibold text-fg mb-4">Asset Allocation</h3>
             <AllocationBar slices={allocation} total={assets} />
           </div>
+        </section>
+
+        {/* ── PLANNING ──────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <SectionDivider label="Planning" color="bg-amber-400" />
+
           <div className="bg-surface-raised border border-surface-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-fg">Financial Goals</h3>
+              <h3 className="text-sm font-semibold text-fg">🎯 Financial Goals</h3>
               <button
                 onClick={() => { setEditingGoal(null); setShowGoalModal(true); }}
                 className="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1"
@@ -185,73 +249,22 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
               </div>
             )}
           </div>
-        </div>
 
-        {/* ── Accounts ──────────────────────────────────────────── */}
-        <div>
-          {/* Section header with actions */}
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-semibold text-fg-3 uppercase tracking-wider">Accounts</h2>
-            <div className="flex items-center gap-2">
-              <PlaidConnect connectedCount={plaidConnectedCount} />
-              <button
-                onClick={() => { setEditingAccount(null); setShowAccountModal(true); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-fg text-sm font-medium rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Add Manual
-              </button>
-            </div>
-          </div>
+          <RecurringExpenses expenses={expenses} />
+          <FinanceTodos todos={todos} />
+        </section>
 
-        {accounts.length === 0 ? (
-          <div className="bg-surface-raised border border-surface-border rounded-2xl p-10 text-center">
-            <p className="text-2xl mb-2">💳</p>
-            <p className="text-sm font-medium text-fg-2">No accounts yet</p>
-            <p className="text-xs text-fg-3 mt-1 mb-4">
-              Connect your bank or add accounts manually to track your net worth.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-5">
-            {assetAccounts.length > 0 && (
-              <AccountGroup
-                title="Assets"
-                total={assets}
-                accounts={assetAccounts}
-                sparklineData={sparklineData}
-                editingBalance={editingBalance}
-                setEditingBalance={setEditingBalance}
-                onBalanceSave={handleBalanceSave}
-                onEdit={(a) => { setEditingAccount(a); setShowAccountModal(true); }}
-              />
-            )}
-            {liabilityAccounts.length > 0 && (
-              <AccountGroup
-                title="Liabilities"
-                total={liabilities}
-                accounts={liabilityAccounts}
-                sparklineData={sparklineData}
-                editingBalance={editingBalance}
-                setEditingBalance={setEditingBalance}
-                onBalanceSave={handleBalanceSave}
-                onEdit={(a) => { setEditingAccount(a); setShowAccountModal(true); }}
-              />
-            )}
-          </div>
-        )}
-        </div>
+        {/* ── INVESTING ─────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <SectionDivider label="Investing" color="bg-emerald-400" />
+          <StockTicker />
+        </section>
 
-        {/* ── Recurring Expenses ────────────────────────────────── */}
-        <RecurringExpenses expenses={expenses} />
-
-        {/* ── Stock Ticker ──────────────────────────────────────── */}
-        <StockTicker />
-
-        {/* ── Chat ──────────────────────────────────────────────── */}
-        <FinanceChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
+        {/* ── ASSISTANT ─────────────────────────────────────────── */}
+        <section className="space-y-4">
+          <SectionDivider label="Assistant" color="bg-violet-400" />
+          <FinanceChat initialMessages={chatMessages} aiConfigured={aiConfigured} />
+        </section>
 
       </div>
 
@@ -266,6 +279,16 @@ export function FinancesView({ accounts, snapshots, goals, todos, chatMessages, 
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
+
+function SectionDivider({ label, color }: { label: string; color: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className={`w-1 h-4 rounded-full flex-shrink-0 ${color}`} />
+      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-3 flex-shrink-0">{label}</span>
+      <div className="flex-1 h-px bg-surface-border" />
+    </div>
+  );
+}
 
 function MetricCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
   return (
