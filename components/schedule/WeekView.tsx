@@ -24,7 +24,7 @@ type Props = {
   onMoveEvent: (id: number, newStart: Date, newEnd: Date) => void;
 };
 
-const START_HOUR = 7;
+const START_HOUR = 6;
 const END_HOUR = 22;
 const HOUR_PX = 64;
 const TOTAL_HEIGHT = (END_HOUR - START_HOUR) * HOUR_PX;
