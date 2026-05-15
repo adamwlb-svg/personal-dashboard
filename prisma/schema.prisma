@@ -177,6 +177,24 @@ model HealthContact {
   updatedAt DateTime @updatedAt
 }
 
+model BusinessIdea {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  stage       String   @default("idea")
+  tags        String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BusinessChatMessage {
+  id        Int      @id @default(autoincrement())
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+}
+
 model Countdown {
   id        Int      @id @default(autoincrement())
   title     String
